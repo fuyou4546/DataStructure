@@ -82,7 +82,10 @@ void testTree() {
 }
 
 void testGraph() {
-    int inode[8] = {1,1,2,3,3,4,5,6};
-    int jnode[8] = {2,4,5,6,5,2,4,6};
-    AdjListGraph* G = ALInitGraph(inode, jnode, 8);
+    int inode[9] = {1,1,2,3,3,4,5,6,2};
+    int jnode[9] = {2,4,5,6,5,2,4,6,1};
+    AdjListGraph* GA = ALInitGraph(inode, jnode, 9);
+    ALDeleteVex(GA, 2);
+    MatGraph *GM = MatInitGraph(inode, jnode, 9);
+    MatDeleteVex(GM, 2);
 }

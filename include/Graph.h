@@ -39,6 +39,7 @@ int ALAddArc(AdjListGraph* G, int x, int y);
 int ALRemoveArc(AdjListGraph* G, int x, int y);
 int ALFirstNeighbor(AdjListGraph* G, int x);
 int ALNextNeighbor(AdjListGraph* G, int x, int y);
+int ALOutDegree(AdjListGraph* G, int x);
 AdjListGraph* ALInitGraph(int* inode, int* jnode, int n);
 
 // 十字链表
@@ -55,6 +56,16 @@ typedef struct {
     OrthList vertices;
     int vexnum, arcnum;
 } OrthListGraph;
+int OrthIsVex(OrthListGraph* G, int x);
+int OrthIsAdj(OrthListGraph* G, int x, int y);
+int OrthInsertVex(OrthListGraph* G, int x);
+int OrthDeleteVex(OrthListGraph* G, int x);
+int OrthAddArc(OrthListGraph* G, int x, int y);
+int OrthRemoveArc(OrthListGraph* G, int x, int y);
+int OrthFirstNeighbor(OrthListGraph* G, int x);
+int OrthNextNeighbor(OrthListGraph* G, int x, int y);
+int OrthOutDegree(OrthListGraph* G, int x);
+OrthListGraph* OrthInitGraph(int* inode, int* jnode, int n);
 
 // 多重链表
 typedef struct MulArcNode {
@@ -71,3 +82,13 @@ typedef struct {
     MulList vertices;
     int vexnum, arcnum;
 } MulListGraph;
+int MLIsVex(MulListGraph* G, int x);
+int MLIsAdj(MulListGraph* G, int x, int y);
+int MLInsertVex(MulListGraph* G, int x);
+int MLDeleteVex(MulListGraph* G, int x);
+int MLAddArc(MulListGraph* G, int x, int y);
+int MLRemoveArc(MulListGraph* G, int x, int y);
+int MLFirstNeighbor(MulListGraph* G, int x);
+int MLNextNeighbor(MulListGraph* G, int x, int y);
+int MLOutDegree(MulListGraph* G, int x);
+MulListGraph* MLInitGraph(int* inode, int* jnode, int n);
