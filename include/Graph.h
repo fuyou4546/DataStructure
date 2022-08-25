@@ -9,6 +9,13 @@ typedef struct {
     int Edge[MaxVerTexNum][MaxVerTexNum];
     int vexnum, arcnum;
 } MatGraph;
+int MatIsVex(MatGraph* G, int x);
+int MatIsAdj(MatGraph* G, int x, int y);
+int MatInsertVex(MatGraph* G, int x);
+int MatDeleteVex(MatGraph* G, int x);
+int MatAddArc(MatGraph* G, int x, int y);
+int MatRemoveArc(MatGraph* G, int x, int y);
+MatGraph* MatInitGraph(int* inode, int* jnode, int n);
 
 // 邻接表
 typedef struct ArcNode {
@@ -24,6 +31,13 @@ typedef struct {
     AdjList vertices;
     int vexnum, arcnum;
 } AdjListGraph;
+int ALIsVex(AdjListGraph* G, int x);
+int ALIsAdj(AdjListGraph* G, int x, int y);
+int ALInsertVex(AdjListGraph* G, int x);
+int ALDeleteVex(AdjListGraph* G, int x);
+int ALAddArc(AdjListGraph* G, int x, int y);
+int ALRemoveArc(AdjListGraph* G, int x, int y);
+AdjListGraph* ALInitGraph(int* inode, int* jnode, int n);
 
 // 十字链表
 typedef struct OrthArcNode {
@@ -55,11 +69,3 @@ typedef struct {
     MulList vertices;
     int vexnum, arcnum;
 } MulListGraph;
-
-int MatIsAdj(MatGraph* G, int x, int y);
-int MatIsVex(MatGraph* G, int x);
-int MatAddArc(MatGraph* G, int x, int y);
-int MatRemoveArc(MatGraph* G, int x, int y);
-int MatInsertVex(MatGraph* G, int x);
-int MatDeleteVex(MatGraph* G, int x);
-MatGraph* initMatGraph(int* inode, int *jnode, int n);
