@@ -4,3 +4,4 @@
 #include "LinkList.h"
 #include "Polynomial.h"
 #include "Tree.h"
+#include "Graph.h"

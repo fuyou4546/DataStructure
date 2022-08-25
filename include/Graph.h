@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MaxVerTexNum 100
+#define MaxVerTexNum 10
 
 // 邻接矩阵
 typedef struct {

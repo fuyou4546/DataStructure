@@ -4,7 +4,7 @@ int MatIsVex(MatGraph* G, int x) {
     return G->Vex[x];
 }
 int MatIsAdj(MatGraph* G, int x, int y) {
-    return MatIsVex(G, x) && MatIsvex(G, y) && G->Edge[x][y];
+    return MatIsVex(G, x) && MatIsVex(G, y) && G->Edge[x][y];
 }
 int MatInsertVex(MatGraph* G, int x) {
     if (MatIsVex(G, x)) return 0;
@@ -36,7 +36,7 @@ int MatRemoveArc(MatGraph* G, int x, int y) {
     G->arcnum--;
     return 1;
 }
-MatGraph* initMatGraph(int* inode, int *jnode, int n) {
+MatGraph* MatInitGraph(int* inode, int *jnode, int n) {
     MatGraph* G = calloc(1, sizeof(MatGraph));
     for (int i = 0; i < n; i++) {
         MatAddArc(G, inode[i], jnode[i]);
@@ -80,12 +80,12 @@ int ALDeleteVex(AdjListGraph* G, int x) {
     return 1;
 }
 int ALAddArc(AdjListGraph* G, int x, int y) {
-    if (!ALIsAdj(G, x, y)) return 0;
+    if (ALIsAdj(G, x, y)) return 0;
     if (!ALIsVex(G, x)) ALInsertVex(G, x);
     if (!ALIsVex(G, y)) ALInsertVex(G, y);
-    ArcNode* p = malloc(sizeof(ArcNode));
+    ArcNode* p = calloc(1, sizeof(ArcNode));
     p->adjvex = y;
-    p->next = G->vertices[x].first->next;
+    p->next = G->vertices[x].first;
     G->vertices[x].first = p;
     G->arcnum++;
     return 1;

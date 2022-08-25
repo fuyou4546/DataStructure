@@ -113,31 +113,7 @@ void trans(Link2* h) {
 }
 
 int main() {
-    // testSLinkList();
-    // testPolynomial();
-    // Link2 l0 = {6, NULL};
-    // Link2 l1 = {5, NULL};
-    // Link2 l2 = {4, &l1};
-    // Link2 l3 = {3, &l2};
-    // Link2 l4 = {2, &l3};
-    // Link2 h = {-1, &l4};
-    // Link2* l = &h;
-    // char* s = "abaaabaaababaabaaabababaababacabacaababa";
-    // char* p = "ababa";
-    // int res = getIndex(s, p);
-    // int a = 0, b[10] = {0};
-    BiNode node10 = {10, NULL, NULL, 0, 0}, node9 = {-8, NULL, NULL, 0, 0}, node8 = {8, NULL, &node10, 0, 0};
-    BiNode node7 = {7, NULL, &node9, 0, 0}, node6 = {6, &node8, NULL, 0, 0}, node5 = {5, &node6, &node7, 0, 0};
-    BiNode node4 = {4, NULL, NULL, 0, 0}, node3 = {3, NULL, NULL, 0, 0}, node2 = {2, &node4, &node5, 0, 0};
-    BiNode node1 = {1, &node2, &node3, 0, 0};
-    BiTree root = &node1;
-    int in[10] = {1,2,3,4,5,6,7,8,9,10};
-    int degree[10] = {2,1,3,1,2,0,0,0,0,0};
-    int** p = getDataWay(root, 7);
-    for (int i = 1; i <= p[0][0]; i++) {
-        for (int j = 1; j <= p[i][0]; j++) {
-            printf("%d ", p[i][j]);
-        }
-        printf("\n");
-    }
+    //testSLinkList();
+    //testPolynomial();
+    testGraph();
 }

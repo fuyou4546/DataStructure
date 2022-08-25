@@ -72,3 +72,17 @@ void testPolynomial() {
     AddPolyn(P1, P2);
     PrintPolyn(P1);
 }
+
+void testTree() {
+    BiNode node10 = {10, NULL, NULL, 0, 0}, node9 = {-8, NULL, NULL, 0, 0}, node8 = {8, NULL, &node10, 0, 0};
+    BiNode node7 = {7, NULL, &node9, 0, 0}, node6 = {6, &node8, NULL, 0, 0}, node5 = {5, &node6, &node7, 0, 0};
+    BiNode node4 = {4, NULL, NULL, 0, 0}, node3 = {3, NULL, NULL, 0, 0}, node2 = {2, &node4, &node5, 0, 0};
+    BiNode node1 = {1, &node2, &node3, 0, 0};
+    BiTree root = &node1;
+}
+
+void testGraph() {
+    int inode[8] = {1,1,2,3,3,4,5,6};
+    int jnode[8] = {2,4,5,6,5,2,4,6};
+    AdjListGraph* G = ALInitGraph(inode, jnode, 8);
+}

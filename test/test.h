@@ -7,3 +7,5 @@ void testSqList();
 void testLinkList();
 void testSLinkList();
 void testPolynomial();
+void testTree();
+void testGraph();
