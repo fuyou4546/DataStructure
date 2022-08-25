@@ -37,6 +37,8 @@ int ALInsertVex(AdjListGraph* G, int x);
 int ALDeleteVex(AdjListGraph* G, int x);
 int ALAddArc(AdjListGraph* G, int x, int y);
 int ALRemoveArc(AdjListGraph* G, int x, int y);
+int ALFirstNeighbor(AdjListGraph* G, int x);
+int ALNextNeighbor(AdjListGraph* G, int x, int y);
 AdjListGraph* ALInitGraph(int* inode, int* jnode, int n);
 
 // 十字链表

@@ -45,6 +45,7 @@ MatGraph* initMatGraph(int* inode, int *jnode, int n) {
 }
 
 
+
 int ALIsVex(AdjListGraph* G, int x) {
     return G->vertices[x].data;
 }
@@ -101,6 +102,20 @@ int ALRemoveArc(AdjListGraph* G, int x, int y) {
     }
     return 0;
 }
+int ALFirstNeighbor(AdjListGraph* G, int x) {
+    if (!ALIsVex(G, x)) return 0;
+    return G->vertices[x].first->adjvex;
+}
+int ALNextNeighbor(AdjListGraph* G, int x, int y) {
+    ArcNode* p = G->vertices[x].first->next;
+    while (p) {
+        if (p->adjvex == y) {
+            if (p->next) return p->next->adjvex;
+            return -1;
+        }
+    }
+    return 0;
+}
 AdjListGraph* ALInitGraph(int* inode, int* jnode, int n) {
     AdjListGraph* G = calloc(1, sizeof(AdjListGraph));
     for (int i = 0; i < n; i++) {
@@ -108,3 +123,4 @@ AdjListGraph* ALInitGraph(int* inode, int* jnode, int n) {
     }
     return G;
 }
+
