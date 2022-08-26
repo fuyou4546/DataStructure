@@ -161,11 +161,13 @@ int OrthInsertVex(OrthListGraph* G, int x) {
 }
 int OrthDeleteVex(OrthListGraph* G, int x) {
     if (!OrthIsVex(G, x)) return 0;
+    // 删弧尾是x的弧
     OrthArcNode* p = G->vertices[x].firstout;
     while (p) {
         OrthRemoveArc(G, x, p->headvex);
         p = G->vertices[x].firstout;
     }
+    // 删弧头是x的弧
     p = G->vertices[x].firstin;
     while (p) {
         OrthRemoveArc(G, p->tailvex, x);
@@ -182,8 +184,10 @@ int OrthAddArc(OrthListGraph* G, int x, int y) {
     OrthArcNode* p = calloc(1, sizeof(OrthArcNode));
     p->tailvex = x;
     p->headvex = y;
+    // 将p插入以x为弧尾的链表
     p->taillink = G->vertices[x].firstout;
     G->vertices[x].firstout = p;
+    // 将p插入以y为弧头的链表
     p->headlink = G->vertices[y].firstin;
     G->vertices[y].firstin = p;
     G->arcnum++;
@@ -191,6 +195,7 @@ int OrthAddArc(OrthListGraph* G, int x, int y) {
 }
 int OrthRemoveArc(OrthListGraph* G, int x, int y) {
     if (!OrthIsVex(G, x) || !OrthIsVex(G, y)) return 0;
+    // 在以x为弧尾的链表中删除弧x->y
     OrthArcNode* p = G->vertices[x].firstout;
     if (!p) return 0;
     if (p->headvex == y) {
@@ -203,6 +208,7 @@ int OrthRemoveArc(OrthListGraph* G, int x, int y) {
         }
         p = p->taillink;
     }
+    // 在以y为弧头的链表中删除弧x->y
     p = G->vertices[y].firstin;
     if (!p) return 0;
     if (p->tailvex == x) {

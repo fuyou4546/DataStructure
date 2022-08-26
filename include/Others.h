@@ -19,4 +19,4 @@ Bool Equal(int, int);
 
 Bool Equal_Data1(Data*, Data*);
 
-#endif _OTHERS_H_
+#endif

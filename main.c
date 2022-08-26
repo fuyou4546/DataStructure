@@ -1,6 +1,6 @@
 #include "./test/test.h"
 #include "./include/kmp.h"
-#define min(A, B) ({ typeof(A) __a = (A); typeof(B) __b = (B); __a < __b ? __a : __b; })
+#define min(A, B) ((A) < (B) ? (A) : (B))
 
 int fab(int k, int m) {
     int* dp = (int*)calloc(m + 1, sizeof(int));

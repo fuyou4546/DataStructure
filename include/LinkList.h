@@ -41,4 +41,4 @@ Status ListInsert(LinkList* L, int i, Data* d);
 Status ListDelete(LinkList* L, int i, Data** d);
 Status ListTraverse(LinkList* L, void (*visit)(Data*));
 
-#endif _LINKLIST_H_
+#endif
