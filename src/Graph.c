@@ -124,12 +124,12 @@ int ALNextNeighbor(AdjListGraph* G, int x, int y) {
 int ALOutDegree(AdjListGraph* G, int x) {
     if (!ALIsVex(G, x)) return 0;
     ArcNode* p = G->vertices[x].first;
-    int outdegree = 0;
+    int count = 0;
     while (p) {
-        outdegree++;
+        count++;
         p = p->next;
     }
-    return outdegree;
+    return count;
 }
 AdjListGraph* ALInitGraph(int* inode, int* jnode, int n) {
     AdjListGraph* G = calloc(1, sizeof(AdjListGraph));
@@ -146,10 +146,10 @@ int OrthIsVex(OrthListGraph* G, int x) {
 }
 int OrthIsAdj(OrthListGraph* G, int x, int y) {
     if (!OrthIsVex(G, x) || !OrthIsVex(G, y)) return 0;
-    ArcNode* p = G->vertices[x].firstout;
+    OrthArcNode* p = G->vertices[x].firstout;
     while (p) {
-        if (p->adjvex == y) return 1;
-        p = p->next;
+        if (p->headvex == y) return 1;
+        p = p->taillink;
     }
     return 0;
 }
@@ -164,8 +164,15 @@ int OrthDeleteVex(OrthListGraph* G, int x) {
     OrthArcNode* p = G->vertices[x].firstout;
     while (p) {
         OrthRemoveArc(G, x, p->headvex);
+        p = G->vertices[x].firstout;
+    }
+    p = G->vertices[x].firstin;
+    while (p) {
+        OrthRemoveArc(G, p->tailvex, x);
+        p = G->vertices[x].firstin;
     }
     G->vertices[x].data = 0;
+    G->vexnum--;
     return 1;
 }
 int OrthAddArc(OrthListGraph* G, int x, int y) {
@@ -185,26 +192,28 @@ int OrthAddArc(OrthListGraph* G, int x, int y) {
 int OrthRemoveArc(OrthListGraph* G, int x, int y) {
     if (!OrthIsVex(G, x) || !OrthIsVex(G, y)) return 0;
     OrthArcNode* p = G->vertices[x].firstout;
+    if (!p) return 0;
     if (p->headvex == y) {
-        p = p->headlink;
-    }
-    else while (p->headlink) {
-        if (p->headlink->headvex == y) {
-            p->headlink = p->headlink->headlink;
-            break;
-        }
-        p = p->headlink;
-    }
-    p = G->vertices[y].firstin;
-    if (p->taillink == x) {
-        p = p->taillink;
+        G->vertices[x].firstout = p->taillink;
     }
     else while (p->taillink) {
-        if (p->taillink->tailvex == x) {
+        if (p->taillink->headvex == y) {
             p->taillink = p->taillink->taillink;
             break;
         }
         p = p->taillink;
+    }
+    p = G->vertices[y].firstin;
+    if (!p) return 0;
+    if (p->tailvex == x) {
+        G->vertices[y].firstin = p->headlink;
+    }
+    else while (p->headlink) {
+        if (p->headlink->tailvex == x) {
+            p->headlink = p->headlink->headlink;
+            break;
+        }
+        p = p->headlink;
     }
     G->arcnum--;
     return 1;
@@ -215,6 +224,41 @@ int OrthFirstNeighbor(OrthListGraph* G, int x) {
     if (!p) return 0;
     return p->headvex;
 }
-int OrthNextNeighbor(OrthListGraph* G, int x, int y);
-int OrthOutDegree(OrthListGraph* G, int x);
-OrthListGraph* OrthInitGraph(int* inode, int* jnode, int n);
+int OrthNextNeighbor(OrthListGraph* G, int x, int y) {
+    OrthArcNode* p = G->vertices[x].firstout;
+    while (p) {
+        if (p->headvex == y) {
+            if (p->taillink) return p->taillink->headvex;
+            return -1;
+        }
+        p = p->taillink;
+    }
+    return 0;
+}
+int OrthOutDegree(OrthListGraph* G, int x) {
+    if (!OrthIsVex(G, x)) return 0;
+    OrthArcNode* p = G->vertices[x].firstout;
+    int count = 0;
+    while (p) {
+        count++;
+        p = p->taillink;
+    }
+    return count;
+}
+int OrthInDegree(OrthListGraph* G, int x) {
+    if (!OrthIsVex(G, x)) return 0;
+    OrthArcNode* p = G->vertices[x].firstin;
+    int count = 0;
+    while (p) {
+        count++;
+        p = p->headlink;
+    }
+    return count;
+}
+OrthListGraph* OrthInitGraph(int* inode, int* jnode, int n) {
+    OrthListGraph* G = calloc(1, sizeof(OrthListGraph));
+    for (int i = 0; i < n; i++) {
+        OrthAddArc(G, inode[i], jnode[i]);
+    }
+    return G;
+}

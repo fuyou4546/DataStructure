@@ -65,6 +65,7 @@ int OrthRemoveArc(OrthListGraph* G, int x, int y);
 int OrthFirstNeighbor(OrthListGraph* G, int x);
 int OrthNextNeighbor(OrthListGraph* G, int x, int y);
 int OrthOutDegree(OrthListGraph* G, int x);
+int OrthInDegree(OrthListGraph* G, int x);
 OrthListGraph* OrthInitGraph(int* inode, int* jnode, int n);
 
 // 多重链表

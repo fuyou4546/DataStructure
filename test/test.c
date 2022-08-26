@@ -84,8 +84,12 @@ void testTree() {
 void testGraph() {
     int inode[9] = {1,1,2,3,3,4,5,6,2};
     int jnode[9] = {2,4,5,6,5,2,4,6,1};
-    AdjListGraph* GA = ALInitGraph(inode, jnode, 9);
-    ALDeleteVex(GA, 2);
-    MatGraph *GM = MatInitGraph(inode, jnode, 9);
-    MatDeleteVex(GM, 2);
+    // AdjListGraph* GA = ALInitGraph(inode, jnode, 9);
+    // ALDeleteVex(GA, 2);
+    // MatGraph *GM = MatInitGraph(inode, jnode, 9);
+    // MatDeleteVex(GM, 2);
+    OrthListGraph* G = OrthInitGraph(inode, jnode, 9);
+    int d = OrthInDegree(G, 6);
+    OrthDeleteVex(G, 2);
+    int p = OrthOutDegree(G, 4);
 }
