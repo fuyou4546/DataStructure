@@ -88,9 +88,8 @@ int ALAddArc(AdjListGraph* G, int x, int y) {
     return 1;
 }
 int ALRemoveArc(AdjListGraph* G, int x, int y) {
-    if (!ALIsVex(G, x) || !ALIsVex(G, y)) return 0;
+    if (!ALIsAdj(G, x, y)) return 0;
     ArcNode* p = G->vertices[x].first;
-    if (!p) return 0;
     if (p->adjvex == y) {
         G->vertices[x].first = p->next;
     }
@@ -194,10 +193,9 @@ int OrthAddArc(OrthListGraph* G, int x, int y) {
     return 1;
 }
 int OrthRemoveArc(OrthListGraph* G, int x, int y) {
-    if (!OrthIsVex(G, x) || !OrthIsVex(G, y)) return 0;
+    if (!OrthIsAdj(G, x, y)) return 0;
     // 在以x为弧尾的链表中删除弧x->y
     OrthArcNode* p = G->vertices[x].firstout;
-    if (!p) return 0;
     if (p->headvex == y) {
         G->vertices[x].firstout = p->taillink;
     }
@@ -210,7 +208,6 @@ int OrthRemoveArc(OrthListGraph* G, int x, int y) {
     }
     // 在以y为弧头的链表中删除弧x->y
     p = G->vertices[y].firstin;
-    if (!p) return 0;
     if (p->tailvex == x) {
         G->vertices[y].firstin = p->headlink;
     }
@@ -265,6 +262,177 @@ OrthListGraph* OrthInitGraph(int* inode, int* jnode, int n) {
     OrthListGraph* G = calloc(1, sizeof(OrthListGraph));
     for (int i = 0; i < n; i++) {
         OrthAddArc(G, inode[i], jnode[i]);
+    }
+    return G;
+}
+
+
+// 多重链表, 简单图
+int MLIsVex(MulListGraph* G, int x) {
+    return G->vertices[x].data;
+}
+int MLIsAdj(MulListGraph* G, int x, int y) {
+    if (!MLIsVex(G, x) || !MLIsVex(G, y)) return 0;
+    MulArcNode* p = G->vertices[x].firstedge;
+    while (p) {
+        if (p->ivex == x) {
+            if (p->jvex == y) return 1;
+            p = p->ilink;
+        }
+        else {
+            if (p->ivex == y) return 1;
+            p = p->jlink;
+        }
+    }
+    return 0;
+}
+int MLInsertVex(MulListGraph* G, int x) {
+    if (MLIsVex(G, x)) return 0;
+    G->vertices[x].data = 1;
+    G->vexnum++;
+    return 1;
+}
+int MLDeleteVex(MulListGraph* G, int x) {
+    if (!MLIsVex(G, x)) return 0;
+    MulArcNode* p = G->vertices[x].firstedge;
+    while (p) {
+        if (p->ivex == x) {
+            MLRemoveArc(G, x, p->jvex);
+            p = p->ilink;
+        }
+        else {
+            MLRemoveArc(G, p->ivex, x);
+            p = p->jlink;
+        }
+    }
+    G->vertices[x].data = 0;
+    G->vexnum--;
+    return 1;
+}
+int MLAddArc(MulListGraph* G, int x, int y) {
+    if (MLIsAdj(G, x, y)) return 0;
+    if (!MLIsVex(G, x)) MLInsertVex(G, x);
+    if (!MLIsVex(G, y)) MLInsertVex(G, y);
+    MulArcNode* p = calloc(1, sizeof(MulArcNode));
+    p->ivex = x;
+    p->jvex = y;
+    p->ilink = G->vertices[x].firstedge;
+    G->vertices[x].firstedge = p;
+    p->jlink = G->vertices[y].firstedge;
+    G->vertices[y].firstedge = p;
+    G->arcnum++;
+    return 1;
+}
+int MLRemoveArc(MulListGraph* G, int x, int y) {
+    // if (!MLIsAdj(G, x, y)) return 0;
+    MulArcNode* p = G->vertices[x].firstedge, *pre = NULL;
+    int flag = 0;
+    while (p) {
+        if (p->ivex == x) {
+            if (p->jvex == y) {
+                if (!pre) G->vertices[x].firstedge = p->ilink;
+                else {
+                    if (flag) pre->ilink = p->ilink;
+                    else pre->jlink = p->ilink;
+                }
+                break;
+            }
+            flag = 1;
+            pre = p;
+            p = p->ilink;
+        }
+        else {
+            if (p->ivex == y) {
+                if (!pre) G->vertices[x].firstedge = p->jlink;
+                else {
+                    if (flag) pre->ilink = p->jlink;
+                    else pre->jlink = p->jlink;
+                }
+                break;
+            }
+            flag = 0;
+            pre = p;
+            p = p->jlink;
+        }
+    }
+    pre = NULL;
+    p = G->vertices[y].firstedge;
+    while (p) {
+        if (p->ivex == y) {
+            if (p->jvex == x) {
+                if (!pre) G->vertices[y].firstedge = p->ilink;
+                else {
+                    if (flag) pre->ilink = p->ilink;
+                    else pre->jlink = p->ilink;
+                }
+                break;
+            }
+            flag = 1;
+            pre = p;
+            p = p->ilink;
+        }
+        else {
+            if (p->ivex == x) {
+                if (!pre) G->vertices[y].firstedge = p->jlink;
+                else {
+                    if (flag) pre->ilink = p->jlink;
+                    else pre->jlink = p->jlink;
+                }
+                break;
+            }
+            flag = 0;
+            pre = p;
+            p = p->jlink;
+        }
+    }
+    G->arcnum--;
+    return 1;
+}
+int MLFirstNeighbor(MulListGraph* G, int x) {
+    if (!MLIsVex(G, x)) return 0;
+    MulArcNode* p = G->vertices[x].firstedge;
+    if (!p) return 0;
+    return p->ivex == x ? p->jvex : p->ivex;
+}
+int MLNextNeighbor(MulListGraph* G, int x, int y) {
+    MulArcNode* p = G->vertices[x].firstedge;
+    while (p) {
+        if (p->ivex == x) {
+            if (p->jvex == y) {
+                if (p->ilink) {
+                    return p->ilink->ivex == x ? p->ilink->jvex : p->ilink->ivex;
+                }
+                return -1;
+            }
+            p = p->ilink;
+        }
+        else {
+            if (p->ivex == y) {
+                if (p->jlink) {
+                    return p->jlink->ivex == x ? p->jlink->jvex : p->jlink->ivex;
+                }
+                return -1;
+            }
+            p = p->jlink;
+        }
+    }
+    return 0;
+}
+int MLDegree(MulListGraph* G, int x) {
+    if (!MLIsVex(G, x)) return 0;
+    MulArcNode* p = G->vertices[x].firstedge;
+    int count = 0;
+    while (p) {
+        count++;
+        if (p->ivex == x) p = p->ilink;
+        else p = p->jlink;
+    }
+    return count;
+}
+MulListGraph* MLInitGraph(int* inode, int* jnode, int n) {
+    MulListGraph* G = calloc(1, sizeof(MulListGraph));
+    for (int i = 0; i < n; i++) {
+        MLAddArc(G, inode[i], jnode[i]);
     }
     return G;
 }

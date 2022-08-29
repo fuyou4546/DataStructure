@@ -91,5 +91,5 @@ int MLAddArc(MulListGraph* G, int x, int y);
 int MLRemoveArc(MulListGraph* G, int x, int y);
 int MLFirstNeighbor(MulListGraph* G, int x);
 int MLNextNeighbor(MulListGraph* G, int x, int y);
-int MLOutDegree(MulListGraph* G, int x);
+int MLDegree(MulListGraph* G, int x);
 MulListGraph* MLInitGraph(int* inode, int* jnode, int n);

@@ -3,7 +3,7 @@
 void getNext(char* p, int* next) {
     int i = 0, j = -1;
     next[0] = -1;
-    while (p[i]) {
+    while (p[i + 1]) {
         if (j == -1 || p[i] == p[j]) {
             i++;
             j++;
@@ -16,7 +16,7 @@ void getNext(char* p, int* next) {
 void getNextval(char* p, int* next) {
     int i = 0, j = -1;
     next[0] = -1;
-    while (p[i]) {
+    while (p[i + 1]) {
         if (j == -1 || p[i] == p[j]) {
             i++;
             j++;
@@ -38,6 +38,7 @@ int getIndex(char* s, char* p) {
             if (!p[j]) {
                 printf("%d\n", i - j);
                 count++;
+                i = i - j + 1;
                 j = 0;
             }
         }
