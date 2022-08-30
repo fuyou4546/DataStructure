@@ -84,14 +84,21 @@ void testTree() {
 void testGraph() {
     int inode[9] = {1,1,2,3,3,4,5,5,6};
     int jnode[9] = {2,4,5,6,5,2,4,3,1};
-    // AdjListGraph* GA = ALInitGraph(inode, jnode, 9);
-    // ALDeleteVex(GA, 2);
-    // MatGraph *GM = MatInitGraph(inode, jnode, 9);
-    // MatDeleteVex(GM, 2);
-    // OrthListGraph* G = OrthInitGraph(inode, jnode, 9);
-    // int d = OrthInDegree(G, 6);
-    // OrthDeleteVex(G, 2);
-    // int p = OrthOutDegree(G, 4);
-    MulListGraph* G = MLInitGraph(inode, jnode, 9);
-    MLDeleteVex(G, 5);
+    AdjListGraph* GA = ALInitGraph(inode, jnode, 9);
+    ALDeleteVex(GA, 2);
+    MatGraph *GMat = MatInitGraph(inode, jnode, 9);
+    MatDeleteVex(GMat, 2);
+    OrthListGraph* GO = OrthInitGraph(inode, jnode, 9);
+    int d = OrthInDegree(GO, 6);
+    OrthDeleteVex(GO, 2);
+    int p = OrthOutDegree(GO, 4);
+    MulListGraph* GMul = MLInitGraph(inode, jnode, 9);
+    MLDeleteVex(GMul, 5);
+}
+
+void testGraphFunc() {
+    int inode[] = {1,2,2,5,3,3,6,8,1};
+    int jnode[] = {2,4,5,8,6,7,9,3,10};
+    AdjListGraph* G = ALInitGraph(inode, jnode, 9);
+    int res = ALGraphIsTree(G);
 }

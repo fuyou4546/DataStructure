@@ -9,3 +9,4 @@ void testSLinkList();
 void testPolynomial();
 void testTree();
 void testGraph();
+void testGraphFunc();

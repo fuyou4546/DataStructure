@@ -115,5 +115,5 @@ void trans(Link2* h) {
 int main() {
     //testSLinkList();
     //testPolynomial();
-    testGraph();
+    testGraphFunc();
 }
