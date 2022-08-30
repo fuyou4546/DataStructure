@@ -97,8 +97,8 @@ void testGraph() {
 }
 
 void testGraphFunc() {
-    int inode[] = {1,2,2,5,3,3,6,8,1};
-    int jnode[] = {2,4,5,8,6,7,9,3,10};
-    AdjListGraph* G = ALInitGraph(inode, jnode, 9);
-    int res = ALGraphIsTree(G);
+    int inode[] = {1,2,5,3,3,6,8,1,5,9,4,1,7,2,10,4,3,7};
+    int jnode[] = {2,4,8,6,7,9,10,3,3,4,1,5,8,7,6,3,4,5};
+    AdjListGraph* G = ALInitGraph(inode, jnode, 18);
+    ALallPath(G, 4, 10);
 }

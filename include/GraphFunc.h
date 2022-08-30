@@ -4,7 +4,10 @@
 
 MatGraph* AdjListToMat(AdjListGraph* G);
 int isEL(MatGraph* G);
-void ALBFS(AdjListGraph* G);
-int* singleShortestPath(AdjListGraph* G, int u);
-void ALDFS(AdjListGraph* G);
-int ALGraphIsTree(AdjListGraph* G);
+void AL_BFS(AdjListGraph* G);
+int* AL_singleShortestPath(AdjListGraph* G, int u);
+void AL_DFS(AdjListGraph* G);
+int AL_GraphIsTree(AdjListGraph* G);
+void AL_DFSwithStack(AdjListGraph* G);
+int ALhavePath(AdjListGraph* G, int u, int v, int mode);
+void ALallPath(AdjListGraph* G, int u, int v);
