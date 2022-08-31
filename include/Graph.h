@@ -16,6 +16,7 @@ int MatDeleteVex(MatGraph* G, int x);
 int MatAddArc(MatGraph* G, int x, int y);
 int MatRemoveArc(MatGraph* G, int x, int y);
 MatGraph* MatInitGraph(int* inode, int* jnode, int n);
+MatGraph* MatInitWithWeight(int* inode, int *jnode, int* weight, int n);
 
 // 邻接表
 typedef struct ArcNode {

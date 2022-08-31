@@ -44,6 +44,19 @@ MatGraph* MatInitGraph(int* inode, int *jnode, int n) {
     }
     return G;
 }
+MatGraph* MatInitWithWeight(int* inode, int *jnode, int* weight, int n) {
+    MatGraph* G = calloc(1, sizeof(MatGraph));
+    for (int i = 0; i < n; i++) {
+        MatAddArc(G, inode[i], jnode[i]);
+        G->Edge[inode[i]][jnode[i]] = weight[i];
+    }
+    for (int i = 1; i <= G->vexnum; i++) {
+        for (int j = 1; j <= G->vexnum; j++) {
+            if (i != j && !G->Edge[i][j]) G->Edge[i][j] = INT_MAX;
+        }
+    }
+    return G;
+}
 
 
 // 邻接表

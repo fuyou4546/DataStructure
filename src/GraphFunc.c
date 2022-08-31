@@ -196,3 +196,91 @@ void ALallPath(AdjListGraph* G, int u, int v) {
     int* path = malloc((G->vexnum + 1) * sizeof(int));
     allpath(G, visited, u, v, path, 0);
 }
+
+int* Prim(MatGraph* G) {
+    int* visited = calloc(G->vexnum + 1, sizeof(int));
+    // dist[i] = d 表示在{V-T}中, 距离{T}最近的
+    int* dist = malloc((G->vexnum + 1) * sizeof(int));
+    int* path = malloc((1 + G->vexnum * sizeof(int)));
+    for (int i = 1; i <= G->vexnum; i++) dist[i] = INT_MAX;
+    // 任选一顶点作为起始点加入T
+    int u = 1, w = 0;
+    visited[u] = 1;
+    dist[u] = 0;
+    path[u] = 0;
+    // 循环 顶点数-1 次即可形成MST
+    for (int i = 1; i < G->vexnum; i++) {
+        w = INT_MAX;
+        for (int j = 1; j <= G->vexnum; j++) {
+            if (!visited[j] && dist[j] < w) {
+                w = dist[j];
+                u = j;
+            }
+        }
+        visited[u] = 1;
+        // 在新顶点u加入T后, 更新各顶点到T的最小距离
+        for (int j = 1; j <= G->vexnum; j++) {
+            if (!visited[j] && G->Edge[u][j] < dist[j]) {
+                dist[j] = G->Edge[u][j];
+                path[j] = u;
+            }
+        }
+    }
+    return path;
+}
+
+// todo 堆排序
+int* Kruskal(AdjListGraph* G) {
+
+}
+
+int* Dijkstra(MatGraph* G, int u) {
+    int* visited = calloc(1 + G->vexnum, sizeof(int));
+    int* dist = malloc((1 + G->vexnum) * sizeof(int));
+    int* path = malloc((1 + G->vexnum) * sizeof(int));
+    for (int i = 1; i <= G->vexnum; i++) {
+        dist[i] = G->Edge[u][i];
+        if (G->Edge[u][i] != INT_MAX) path[i] = u;
+    }
+    path[u] = 0;
+    visited[u] = 1;
+    int v = 0, w = 0;
+    for (int i = 1; i < G->vexnum; i++) {
+        w = INT_MAX;
+        for (int j = 1; j <= G->vexnum; j++) {
+            if (!visited[j] && dist[j] < w) {
+                w = dist[j];
+                v = j;
+            }
+        }
+        visited[v] = 1;
+        for (int j = 1; j <= G->vexnum; j++) {
+            if (!visited[j] && G->Edge[v][j] != INT_MAX && dist[v] + G->Edge[v][j] < dist[j]) {
+                dist[j] = dist[v] + G->Edge[v][j];
+                path[j] = v;
+            }
+        }
+    }
+    return path;
+}
+
+int** Floyd(MatGraph* G) {
+    int** path = malloc((1 + G->vexnum) * sizeof(int*));
+    for (int i = 0; i <= G->vexnum; i++) path[i] = malloc((1 + G->vexnum) * sizeof(int));
+    for (int i = 1; i <= G->vexnum; i++) {
+        for (int j = 1; j <= G->vexnum; j++) {
+            path[i][j] = G->Edge[i][j];
+        }
+    }
+    for (int k = 1; k <= G->vexnum; k++) {
+        for (int i = 1; i <= G->vexnum; i++) {
+            for (int j = 1; j <= G->vexnum; j++) {
+                if (path[i][k] != INT_MAX && path[k][j] != INT_MAX 
+                    && path[i][k] + path[k][j] < path[i][j]) {
+                    path[i][j] = path[i][k] + path[k][j];
+                }
+            }
+        }
+    }
+    return path;
+}

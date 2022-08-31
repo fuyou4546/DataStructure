@@ -385,3 +385,14 @@ int** getDataWay(BiTree T, int data) {
     path = realloc(path, i * sizeof(int*));
     return path;
 }
+
+void UFinit() {
+    for (int i = 0; i < MAX_TREE_SIZE; i++) UFset[i] = i;
+}
+int UFfind(int x) {
+    if (x = UFset[x]) return x;
+    return UFset[x] = UFfind(UFset[x]);
+}
+void UFmerge(int x, int y) {
+    UFset[UFfind(x)] = UFfind(y);
+}

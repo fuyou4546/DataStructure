@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "Graph.h"
+#include "Structures.h"
 
 MatGraph* AdjListToMat(AdjListGraph* G);
 int isEL(MatGraph* G);
@@ -11,3 +11,7 @@ int AL_GraphIsTree(AdjListGraph* G);
 void AL_DFSwithStack(AdjListGraph* G);
 int ALhavePath(AdjListGraph* G, int u, int v, int mode);
 void ALallPath(AdjListGraph* G, int u, int v);
+int* Prim(MatGraph* G);
+int* Kruskal(AdjListGraph* G);
+int* Dijkstra(MatGraph* G, int u);
+int** Floyd(MatGraph* G);

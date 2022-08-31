@@ -1,16 +1,32 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define MAX_TREE_SIZE 20
+
 typedef struct BiNode {
     int data;
     struct BiNode* lchild, *rchild, *parent;
     int ltag, rtag;
 } BiNode, *BiTree;
 
+typedef struct {
+    int data;
+    int parent;
+} PTNode;
+typedef struct {
+    PTNode nodes[MAX_TREE_SIZE];
+    int n;
+} PTree;
+
 typedef struct CSNode {
     int data;
     struct CSNode* firstchild, *nextsibling;
 } CSNode, *CSTree;
+
+int UFset[MAX_TREE_SIZE];
+void UFinit();
+int UFfind(int x);
+void UFmerge(int x, int y);
 
 void addParent(BiTree T);
 void createPreThread(BiTree T);
