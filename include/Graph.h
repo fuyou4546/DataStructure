@@ -47,7 +47,7 @@ AdjListGraph* ALInitGraph(int* inode, int* jnode, int n);
 typedef struct OrthArcNode {
     int tailvex, headvex;
     struct OrthArcNode* taillink, *headlink;
-    int info;
+    int id, weight;
 } OrthArcNode;
 typedef struct {
     int data;
@@ -68,6 +68,7 @@ int OrthNextNeighbor(OrthListGraph* G, int x, int y);
 int OrthOutDegree(OrthListGraph* G, int x);
 int OrthInDegree(OrthListGraph* G, int x);
 OrthListGraph* OrthInitGraph(int* inode, int* jnode, int n);
+OrthListGraph* OrthInitWithIdAndWeight(int* inode, int* jnode, int* weight, int n);
 
 // 多重链表
 typedef struct MulArcNode {

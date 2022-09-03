@@ -97,28 +97,13 @@ void testGraph() {
 }
 
 void testGraphFunc() {
-    // int inode[] = {1,2,5,3,3,6,8,1,5,9,4,1,7,2,10,4,3,7};
-    // int jnode[] = {2,4,8,6,7,9,10,3,3,4,1,5,8,7,6,3,4,5};
-    // AdjListGraph* G = ALInitGraph(inode, jnode, 18);
-    // ALallPath(G, 4, 10);
-    int inode[] = {1,1,2,2,3,4,4,5,5,5};
-    int jnode[] = {2,5,3,5,4,1,3,2,4,3};
-    int weight[] = {10,5,1,2,4,7,6,3,2,9};
-    MatGraph* G = MatInitWithWeight(inode, jnode, weight, 10);
-    // int* p = Prim(G);
-    // for (int i = 1; i <= G->vexnum; i++) {
-    //     printf("%d ", p[i]);
-    // }
-    // printf("\n");
-    // p = Dijkstra(G, 1);
-    // for (int i = 1; i <= G->vexnum; i++) {
-    //     printf("%d ", p[i]);
-    // }
-    int** p = Floyd(G);
-    for (int i = 1; i <= G->vexnum; i++) {
-        for (int j = 1; j <= G->vexnum; j++) {
-            printf("<%d,%d>:%-3d", i, j, p[i][j]);
-        }
-        printf("\n");
+    int inode[] = {1,1,2,2,3,3,4,5};
+    int jnode[] = {2,3,4,5,4,6,6,6};
+    int weight[] = {3,2,2,3,4,3,2,1};
+    OrthListGraph* G = OrthInitWithIdAndWeight(inode, jnode, weight, 8);
+    int* path = CriticalPath(G);
+    for (int i = 1; i <= path[0] - 1; i++) {
+        printf("%d->", path[i]);
     }
+    printf("%d", path[path[0]]);
 }

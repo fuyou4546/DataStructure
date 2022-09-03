@@ -278,6 +278,15 @@ OrthListGraph* OrthInitGraph(int* inode, int* jnode, int n) {
     }
     return G;
 }
+OrthListGraph* OrthInitWithIdAndWeight(int* inode, int* jnode, int* weight, int n) {
+    OrthListGraph* G = calloc(1, sizeof(OrthListGraph));
+    for (int i = 0; i < n; i++) {
+        OrthAddArc(G, inode[i], jnode[i]);
+        G->vertices[inode[i]].firstout->id = i + 1;
+        G->vertices[inode[i]].firstout->weight = weight[i];
+    }
+    return G;
+}
 
 
 // 多重链表, 简单图

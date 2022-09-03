@@ -284,3 +284,80 @@ int** Floyd(MatGraph* G) {
     }
     return path;
 }
+
+int* TopologicalSort(AdjListGraph* G) {
+    int* st = malloc((1 + G->vexnum) * sizeof(int));
+    int* indegree = calloc(1 + G->vexnum, sizeof(int));
+    int* seq = malloc((1 + G->vexnum) * sizeof(int));
+    int top = -1, u = 0, cur = 0;
+    for (int i = 1; i <= G->vexnum; i++) {
+        for (ArcNode* p = G->vertices[i].first; p; p = p->next) {
+            indegree[p->adjvex]++;
+        }
+    }
+    for (int i = 1; i <= G->vexnum; i++) {
+        if (!indegree[i]) st[++top] = i;
+    }
+    while (top != -1) {
+        u = st[top--];
+        seq[cur++] = u;
+        for (ArcNode* p = G->vertices[u].first; p; p = p->next) {
+            indegree[p->adjvex]--;
+            if (!indegree[p->adjvex]) st[++top] = p->adjvex;
+        }
+    }
+    return seq;
+}
+
+int* CriticalPath(OrthListGraph* G) {
+    int* st = malloc((1 + G->vexnum) * sizeof(int));
+    int* indegree = calloc(1 + G->vexnum, sizeof(int));
+    int* ve = calloc(1 + G->vexnum, sizeof(int));
+    int* vl = malloc((1 + G->vexnum) * sizeof(int));
+    int* path = malloc((1 + G->vexnum) * sizeof(int));
+    int top = -1, cur = G->vexnum, u = 0;
+    ve[1] = 0, path[0] = 0;
+    for (int i = 1; i <= G->vexnum; i++) {
+        vl[i] = INT_MAX;
+        for (OrthArcNode* p = G->vertices[i].firstin; p; p = p->headlink) {
+            indegree[p->headvex]++;
+        }
+    }
+    for (int i = 1; i <= G->vexnum; i++) {
+        if (!indegree[i]) st[++top] = i;
+    }
+    while (top != -1) {
+        u = st[top--];
+        path[cur--] = u;
+        for (OrthArcNode* p = G->vertices[u].firstout; p; p = p->taillink) {
+            if (ve[u] + p->weight > ve[p->headvex]) {
+                ve[p->headvex] = ve[u] + p->weight;
+            }
+            indegree[p->headvex]--;
+            if (!indegree[p->headvex]) {
+                st[++top] = p->headvex;
+            }
+        }
+    }
+    vl[G->vexnum] = ve[G->vexnum];
+    for (int i = 1; i <= G->vexnum; i++) {
+        u = path[i];
+        for (OrthArcNode* p = G->vertices[u].firstin; p; p = p->headlink) {
+            if (vl[u] - p->weight < vl[p->tailvex]) {
+                vl[p->tailvex] = vl[u] - p->weight;
+            }
+        }
+    }
+    u = 1;
+    OrthArcNode* p = G->vertices[u].firstout;
+    while (p) {
+        if (ve[u] == vl[p->headvex] - p->weight) {
+            path[++path[0]] = u;
+            u = p->headvex;
+            p = G->vertices[u].firstout;
+        }
+        else p = p->taillink;
+    }
+    path[++path[0]] = G->vexnum;
+    return path;
+}
