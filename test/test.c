@@ -100,10 +100,13 @@ void testGraphFunc() {
     int inode[] = {1,1,2,2,3,3,4,5};
     int jnode[] = {2,3,4,5,4,6,6,6};
     int weight[] = {3,2,2,3,4,3,2,1};
-    OrthListGraph* G = OrthInitWithIdAndWeight(inode, jnode, weight, 8);
-    int* path = CriticalPath(G);
-    for (int i = 1; i <= path[0] - 1; i++) {
-        printf("%d->", path[i]);
-    }
-    printf("%d", path[path[0]]);
+    // OrthListGraph* G = OrthInitWithIdAndWeight(inode, jnode, weight, 8);
+    // int* path = CriticalPath(G);
+    // for (int i = 1; i <= path[0] - 1; i++) {
+    //     printf("%d->", path[i]);
+    // }
+    // printf("%d", path[path[0]]);
+    AdjListGraph* G = ALInitGraph(inode, jnode, 8);
+    int* seq = TopologicalSortUseDFS(G);
+    for (int i = 1; i <= G->vexnum; i++) printf("%d ", seq[i]);
 }

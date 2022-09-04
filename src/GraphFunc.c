@@ -245,6 +245,7 @@ int* Dijkstra(MatGraph* G, int u) {
     path[u] = 0;
     visited[u] = 1;
     int v = 0, w = 0;
+    // 只是确定循环数
     for (int i = 1; i < G->vexnum; i++) {
         w = INT_MAX;
         for (int j = 1; j <= G->vexnum; j++) {
@@ -312,11 +313,16 @@ int* TopologicalSort(AdjListGraph* G) {
 int* CriticalPath(OrthListGraph* G) {
     int* st = malloc((1 + G->vexnum) * sizeof(int));
     int* indegree = calloc(1 + G->vexnum, sizeof(int));
+    // ve[i] 表示 顶点i的最早发生时间
     int* ve = calloc(1 + G->vexnum, sizeof(int));
+    // vl[i] 表示 顶点i的最迟发生时间
     int* vl = malloc((1 + G->vexnum) * sizeof(int));
+    // 前期保存拓扑序列, 后期保存关键路径
     int* path = malloc((1 + G->vexnum) * sizeof(int));
     int top = -1, cur = G->vexnum, u = 0;
+    // 源点最早为0
     ve[1] = 0, path[0] = 0;
+    // 初始化 vl 并 统计各顶点入度, 进行拓扑排序
     for (int i = 1; i <= G->vexnum; i++) {
         vl[i] = INT_MAX;
         for (OrthArcNode* p = G->vertices[i].firstin; p; p = p->headlink) {
@@ -339,6 +345,7 @@ int* CriticalPath(OrthListGraph* G) {
             }
         }
     }
+    // 汇点的最迟 = 汇点的最早
     vl[G->vexnum] = ve[G->vexnum];
     for (int i = 1; i <= G->vexnum; i++) {
         u = path[i];
@@ -351,6 +358,8 @@ int* CriticalPath(OrthListGraph* G) {
     u = 1;
     OrthArcNode* p = G->vertices[u].firstout;
     while (p) {
+        // ve[u] 表示 弧<u,p->headvex> 的最早开始时间
+        // vl[p->headvex]-p->weight 表示 弧<u,p->headvex> 的最迟开始时间
         if (ve[u] == vl[p->headvex] - p->weight) {
             path[++path[0]] = u;
             u = p->headvex;
@@ -358,6 +367,25 @@ int* CriticalPath(OrthListGraph* G) {
         }
         else p = p->taillink;
     }
+    // 添加上述循环没添加的汇点
     path[++path[0]] = G->vexnum;
     return path;
+}
+
+void TSdfs(AdjListGraph* G, int u, int* visited, int* seq, int* time) {
+    if (visited[u]) return;
+    visited[u] = 1;
+    for (ArcNode* p = G->vertices[u].first; p; p = p->next) {
+        TSdfs(G, p->adjvex, visited, seq, time);
+    }
+    seq[u] = ++(*time);
+}
+int* TopologicalSortUseDFS(AdjListGraph* G) {
+    int* visited = calloc(1 + G->vexnum, sizeof(int));
+    int* seq = malloc((1 + G->vexnum) * sizeof(int));
+    int time = 0;
+    for (int i = 1; i <= G->vexnum; i++) {
+        TSdfs(G, i, visited, seq, &time);
+    }
+    return seq;
 }

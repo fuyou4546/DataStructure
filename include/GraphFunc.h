@@ -18,3 +18,4 @@ int** Floyd(MatGraph* G);
 int* TopologicalSort(AdjListGraph* G);
 // 返回关键路径, 首元素为路径长
 int* CriticalPath(OrthListGraph* G);
+int* TopologicalSortUseDFS(AdjListGraph* G);
