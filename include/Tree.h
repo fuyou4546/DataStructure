@@ -7,7 +7,7 @@ typedef struct BiNode {
     int data;
     struct BiNode* lchild, *rchild, *parent;
     int ltag, rtag;
-} BiNode, *BiTree;
+} BiNode, *BiTree, BSTNode;
 
 typedef struct {
     int data;

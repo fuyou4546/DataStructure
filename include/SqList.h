@@ -9,7 +9,7 @@ typedef struct {
     int* elem;
     int length;
     int listsize;
-}SqList;
+} SqList;
 
 Status InitList_Sq(SqList*);
 void DestroyList_Sq(SqList*);

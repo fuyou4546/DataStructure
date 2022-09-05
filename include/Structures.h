@@ -9,5 +9,6 @@
 #include "Tree.h"
 #include "Graph.h"
 #include "GraphFunc.h"
+#include "Search.h"
 
 #endif

@@ -110,3 +110,51 @@ void testGraphFunc() {
     int* seq = TopologicalSortUseDFS(G);
     for (int i = 1; i <= G->vexnum; i++) printf("%d ", seq[i]);
 }
+
+testData* randData(int x, int y, int n) {
+    testData* D = malloc(sizeof(testData));
+    D->seq = malloc(n * sizeof(int));
+    D->length = n;
+    BiTree T = NULL;
+    int key = 0;
+    srand(time(0));
+    while (n) {
+        key = rand() % (y - x + 1) + x;
+        if (!BST_Search(T, key)) {
+            BST_Insert(&T, key);
+            n--;
+            D->seq[n] = key;
+        }
+    }
+    return D;
+}
+
+void testBST() {
+    int testTimes = 1000;
+    int dataStart = 0;
+    int dataEnd = 1000;
+    int dataNum = 100;
+    int deleteTimes = 100;
+    FILE* fp = fopen("./output.txt", "w+");
+    testData* D = NULL;
+    BiTree T = NULL;
+    srand(time(0));
+    for (int i = 0; i < testTimes; i++) {
+        D = randData(dataStart, dataEnd, dataNum);
+        T = BST_Init(D->seq, dataNum);
+        for (int i = 0; i < deleteTimes; i++) {
+            BST_Delete(T, D->seq[rand() % dataNum]);
+        }
+        if (!isBST(T)) {
+            for (int i = 0; i < dataNum; i++) {
+                fprintf(fp, "%d ", D->seq[i]);
+            }
+            fprintf(fp, "\n");
+        }
+    }
+    fclose(fp);
+}
+
+void testSearch() {
+    testBST();
+}
