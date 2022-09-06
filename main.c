@@ -24,6 +24,7 @@ int test() {
         k++;
     }
     printf("%d", a[10]);
+    free(a);
     return 1;
 }
 int getM_sameLen(int* a, int* b, int len) {

@@ -49,6 +49,7 @@ void ALBFS(AdjListGraph* G) {
     for (int i = 1; i <= G->vexnum; i++) {
         bfs(G, visited, i);
     }
+    free(visited);
 }
 
 int* singleShortestPath(AdjListGraph* G, int u) {
@@ -71,6 +72,8 @@ int* singleShortestPath(AdjListGraph* G, int u) {
             }
         }
     }
+    free(Q);
+    free(visited);
     return path;
 }
 
@@ -87,6 +90,7 @@ void ALDFS(AdjListGraph* G) {
     for (int i = 1; i <= G->vexnum; i++) {
         dfs(G, visited, i);
     }
+    free(visited);
 }
 
 int dfsGIT(AdjListGraph* G, int* visited, int* count, int* flag, int u, int pre) {
@@ -118,6 +122,7 @@ int ALGraphIsTree(AdjListGraph* G) {
     int* visited = calloc(G->vexnum + 1, sizeof(int));
     // return dfsGIT(G, visited, &count, &flag, 1, 0);
     dfsGIT2(G, visited, &vexnum, &edgenum, 1);
+    free(visited);
     return vexnum == G->vexnum && edgenum == (vexnum - 1) * 2;
 }
 
@@ -136,12 +141,14 @@ void ALDFSwS(AdjListGraph* G, int* visited, int u) {
             }
         }
     }
+    free(st);
 }
 void ALDFSwithStack(AdjListGraph* G) {
     int* visited = calloc(1 + G->vexnum, sizeof(int));
     for (int i = 1; i <= G->vexnum; i++) {
         ALDFSwS(G, visited, i);
     }
+    free(visited);
 }
 
 int havePath_bfs(AdjListGraph* G, int* visited, int u, int v) {
@@ -153,12 +160,16 @@ int havePath_bfs(AdjListGraph* G, int* visited, int u, int v) {
         p = Q[front++];
         for (ArcNode* x = G->vertices[p].first; x; x = x->next) {
             if (!visited[x->adjvex]) {
-                if (x->adjvex == v) return 1;
+                if (x->adjvex == v) {
+                    free(Q);
+                    return 1;
+                }
                 visited[x->adjvex] = 1;
                 Q[rear++] = x->adjvex;
             }
         }
     }
+    free(Q);
     return 0;
 }
 int havePath_dfs(AdjListGraph* G, int* visited, int u, int v) {
@@ -195,6 +206,8 @@ void ALallPath(AdjListGraph* G, int u, int v) {
     int* visited = calloc(G->vexnum + 1, sizeof(int));
     int* path = malloc((G->vexnum + 1) * sizeof(int));
     allpath(G, visited, u, v, path, 0);
+    free(visited);
+    free(path);
 }
 
 int* Prim(MatGraph* G) {
@@ -226,6 +239,8 @@ int* Prim(MatGraph* G) {
             }
         }
     }
+    free(visited);
+    free(dist);
     return path;
 }
 
@@ -262,6 +277,8 @@ int* Dijkstra(MatGraph* G, int u) {
             }
         }
     }
+    free(visited);
+    free(dist);
     return path;
 }
 
@@ -307,6 +324,8 @@ int* TopologicalSort(AdjListGraph* G) {
             if (!indegree[p->adjvex]) st[++top] = p->adjvex;
         }
     }
+    free(st);
+    free(indegree);
     return seq;
 }
 
@@ -369,6 +388,9 @@ int* CriticalPath(OrthListGraph* G) {
     }
     // 添加上述循环没添加的汇点
     path[++path[0]] = G->vexnum;
+    free(st);
+    free(ve);
+    free(vl);
     return path;
 }
 
@@ -387,5 +409,6 @@ int* TopologicalSortUseDFS(AdjListGraph* G) {
     for (int i = 1; i <= G->vexnum; i++) {
         TSdfs(G, i, visited, seq, &time);
     }
+    free(visited);
     return seq;
 }

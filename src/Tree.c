@@ -396,3 +396,8 @@ int UFfind(int x) {
 void UFmerge(int x, int y) {
     UFset[UFfind(x)] = UFfind(y);
 }
+
+int countNode(BiTree T) {
+    if (!T) return 0;
+    return countNode(T->lchild) + countNode(T->rchild) + 1;
+}

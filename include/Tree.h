@@ -7,7 +7,7 @@ typedef struct BiNode {
     int data;
     struct BiNode* lchild, *rchild, *parent;
     int ltag, rtag;
-} BiNode, *BiTree, BSTNode;
+} BiNode, *BiTree, BSTNode, AVLNode;
 
 typedef struct {
     int data;
@@ -56,3 +56,4 @@ int countLeafs(CSTree T);
 int getCSHeight(CSTree T);
 CSTree buildCSTree(int* in, int* degree);
 int** getDataWay(BiTree T, int data);
+int countNode(BiTree T);

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <Windows.h>
 #include "../include/Structures.h"
 
 typedef struct {
@@ -19,3 +20,4 @@ void testGraphFunc();
 void testSearch();
 testData* randData(int x, int y, int n);
 void testBST();
+void testAVL();

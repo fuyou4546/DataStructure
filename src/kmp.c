@@ -44,5 +44,6 @@ int getIndex(char* s, char* p) {
         }
         else j = next[j];
     }
+    free(next);
     return count;
 }
