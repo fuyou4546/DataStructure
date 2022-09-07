@@ -7,7 +7,13 @@ typedef struct BiNode {
     int data;
     struct BiNode* lchild, *rchild, *parent;
     int ltag, rtag;
-} BiNode, *BiTree, BSTNode, AVLNode;
+} BiNode, *BiTree;
+
+typedef struct BiNode_Search {
+    int data;
+    char color;
+    struct BiNode_Search* lchild, *rchild;
+} SearchNode, *SearchTree, BSTNode, AVLNode, RBNode, *BSTTree, *AVLTree, *RBTree;
 
 typedef struct {
     int data;

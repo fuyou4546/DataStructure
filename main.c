@@ -1,6 +1,5 @@
 #include "./test/test.h"
 #include "./include/kmp.h"
-#define min(A, B) ((A) < (B) ? (A) : (B))
 
 int fab(int k, int m) {
     int* dp = (int*)calloc(m + 1, sizeof(int));

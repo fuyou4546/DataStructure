@@ -115,8 +115,9 @@ testData* randData(int x, int y, int n) {
     testData* D = malloc(sizeof(testData));
     D->seq = malloc(n * sizeof(int));
     D->length = n;
-    BiTree T = NULL;
+    AVLTree T = NULL;
     int key = 0;
+    Sleep(10);
     srand(time(0));
     while (n) {
         key = rand() % (y - x + 1) + x;
@@ -130,14 +131,14 @@ testData* randData(int x, int y, int n) {
 }
 
 void testBST() {
-    int testTimes = 30;
+    int testTimes = 500;
     int dataStart = 0;
     int dataEnd = 1000;
     int dataNum = 50;
     int deleteTimes = 10;
     FILE* fp = fopen("test/output.txt", "w+");
     testData* D = NULL;
-    BiTree T = NULL;
+    BSTTree T = NULL;
     for (int i = 0; i < testTimes; i++) {
         D = randData(dataStart, dataEnd, dataNum);
         T = BST_Init(D->seq, dataNum);
@@ -158,16 +159,16 @@ void testAVL() {
     int testTimes = 200;
     int dataStart = 0;
     int dataEnd = 1000;
-    int dataNum = 50;
-    int deleteTimes = 20;
+    int dataNum = 100;
+    int deleteTimes = 40;
     FILE* fp = fopen("test/output.txt", "w");
     testData* D = NULL;
-    BiTree T = NULL;
+    AVLTree T = NULL;
     for (int i = 0; i < testTimes; i++) {
         D = randData(dataStart, dataEnd, dataNum);
         T = AVL_Init(D->seq, dataNum);
         for (int i = 0; i < deleteTimes; i++) {
-            AVL_Delete_Test(&T, D->seq[i]);
+            AVL_Delete(&T, D->seq[i]);
         }
         if (!isAVL(T)) {
             for (int i = 0; i < dataNum - 1; i++) {
@@ -182,16 +183,46 @@ void testAVL() {
 void testAVL_single() {
     int deleteTimes = 5;
     int data[] = {935, 709, 151, 536, 998, 606, 396, 782, 582, 117, 736, 439, 798, 801, 774, 992, 245, 353, 203, 877, 577, 255, 787, 953, 400, 731, 397, 583, 945, 691, 940, 218, 756, 586, 607, 485, 333, 264, 843, 54, 876, 673, 646, 837, 288, 418, 268, 107, 85, 133};
-    BiTree T = AVL_Init(data, 50);
+    AVLTree T = AVL_Init(data, 50);
     int flag = 0;
     for (int i = 0; i < deleteTimes; i++) {
-        AVL_Delete_Test(&T, data[i]);
+        AVL_Delete(&T, data[i]);
         flag = isAVL(T);
     }
 }
 
+void testRB_single() {
+    int dataNum = 20;
+    int data[] = {245, 622, 83, 143, 213, 179, 527, 127, 404, 43, 125, 616, 507, 851, 463, 992, 366, 520, 646, 795};
+    RBTree T = RB_Init(data, dataNum);
+    int flag = isRB(T);
+}
+
+void testRB() {
+    int testTimes = 500;
+    int dataStart = 0;
+    int dataEnd = 1000;
+    int dataNum = 100;
+    int deleteTimes = 20;
+    FILE* fp = fopen("test/output.txt", "w");
+    testData* D = NULL;
+    RBTree T = NULL;
+    for (int i = 0; i < testTimes; i++) {
+        D = randData(dataStart, dataEnd, dataNum);
+        T = RB_Init(D->seq, dataNum);
+        if (!isRB(T)) {
+            for (int i = 0; i < dataNum - 1; i++) {
+                fprintf(fp, "%d, ", D->seq[i]);
+            }
+            fprintf(fp, "%d\n", D->seq[dataNum - 1]);
+        }
+    }
+    fclose(fp);
+}
+
 void testSearch() {
-    testAVL();
+    //testAVL();
     //testAVL_single();
-    //testBST();
+    //testRB_single();
+    testRB();
 }
