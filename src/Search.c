@@ -265,10 +265,9 @@ int isAVL(AVLTree T) {
 }
 
 int AVL_Delete(AVLTree* T, int key) {
-    AVLTree p = *T, path[MAX_LEN];
+    AVLTree p = *T, q, path[MAX_LEN];
     int top = -1;
     if (!BST_Delete_Path(T, key, path, &top)) return 0;
-    AVLNode* q = NULL;
     int hl = 0, hr = 0, flag = 0;
     for (int i = top; i >= 0; i--) {
         q = path[i];
@@ -397,4 +396,205 @@ int isRB(RBTree T) {
         p = p->lchild;
     }
     return isrb(T, countBlack, 0);
+}
+
+int RB_Delete(RBTree* T, int key) {
+    RBTree p = *T, path[MAX_LEN];
+    int top = -1;
+    while (p && p->data != key) {
+        path[++top] = p;
+        if (key < p->data) {
+            p = p->lchild;
+        }
+        else {
+            p = p->rchild;
+        }
+    }
+    if (!p) return 0;
+    RBTree q = NULL;
+    // case1, 待删结点p有左右孩子, 用直接后继的值替代其值, 转换为删除其直接后继
+    if (p->lchild && p->rchild) {
+        int temp = 0;
+        q = p->rchild;
+        while (q && q->lchild) {
+            q = q->lchild;
+        }
+        temp = q->data;
+        RB_Delete(T, q->data);
+        p->data = temp;
+        return 1;
+    }
+    // case2, 待删结点p只有左或右孩子
+    if (p->lchild) {
+        p->lchild->color = 'b';
+        if (top == -1) {
+            *T = p->lchild;
+        }
+        else if (path[top]->lchild == p) {
+            path[top]->lchild = p->lchild;
+        }
+        else {
+            path[top]->rchild = p->lchild;
+        }
+        return 1;
+    }
+    if (p->rchild) {
+        p->rchild->color = 'b';
+        if (top == -1) {
+            *T = p->rchild;
+        }
+        else if (path[top]->lchild == p) {
+            path[top]->lchild = p->rchild;
+        }
+        else {
+            path[top]->rchild = p->rchild;
+        }
+        return 1;
+    }
+    // case3, 待删结点p无孩子
+    // case3.0, 待删结点p为根节点
+    if (top == -1) {
+        *T = NULL;
+        return 1;
+    }
+    // 记pp为p的双亲结点
+    RBTree pp = path[top];
+    // case3.1, 待删结点p为红结点, 直接删除
+    if (p->color == 'r') {
+        if (pp->lchild == p) {
+            pp->lchild = NULL;
+        }
+        else {
+            pp->rchild = NULL;
+        }
+        return 1;
+    }
+    // case3.2, 待删结点p为黑结点, 将p更新为用来代替待删结点p的结点
+    if (pp->lchild == p) {
+        pp->lchild = NULL;
+    }
+    else {
+        pp->rchild = NULL;
+    }
+    p = NULL;
+    RBNode* bro = NULL;
+    while (1) {
+        // case3.2, p是其双亲结点的左结点的情况
+        if (pp->lchild == p) {
+            bro = pp->rchild;
+            // case3.2.1, p的兄弟bro是红色的
+            if (bro->color == 'r') {
+                bro->color = 'b';
+                pp->color = 'r';
+                q = Rotate(pp, "RR");
+                if (!top) {
+                    *T = q;
+                }
+                else if (path[top - 1]->lchild == pp) {
+                    path[top - 1]->lchild = q;
+                }
+                else {
+                    path[top - 1]->rchild = q;
+                }
+                path[top] = q;
+                path[++top] = pp;
+            }
+            else {
+                // case3.2.2, bro是黑色的 且 bro的左孩子是红色的，右孩子是黑色的
+                if (bro->lchild && bro->lchild->color == 'r' && 
+                        (!bro->rchild || bro->rchild->color == 'b')) {
+                    bro->color = 'r';
+                    bro->lchild->color = 'b';
+                    q = Rotate(bro, "LL");
+                    pp->rchild = q;
+                }
+                // case3.2.3, bro是黑色的 且 bro的右孩子是红色的
+                else if (bro->rchild && bro->rchild->color == 'r') {
+                    bro->color = pp->color;
+                    pp->color = 'b';
+                    bro->rchild->color = 'b';
+                    q = Rotate(pp, "RR");
+                    if (!top) {
+                        *T = q;
+                    }
+                    else if (path[top - 1]->lchild == pp) {
+                        path[top - 1]->lchild = q;
+                    }
+                    else {
+                        path[top - 1]->rchild = q;
+                    }
+                    return 1;
+                }
+                // case3.2.3, bro是黑色的 且 bro的孩子都是黑色的
+                else {
+                    bro->color = 'r';
+                    if (!top || pp->color == 'r') {
+                        pp->color = 'b';
+                        return 1;                                
+                    }
+                    p = pp;
+                    pp = path[--top];
+                }
+            }
+        }
+        // case3.2, p是其双亲结点的右结点的情况
+        else {
+            bro = pp->lchild;
+            // case3.2.1, p的兄弟bro是红色的
+            if (bro->color == 'r') {
+                bro->color = 'b';
+                pp->color = 'r';
+                q = Rotate(pp, "LL");
+                if (!top) {
+                    *T = q;
+                }
+                else if (path[top - 1]->lchild == pp) {
+                    path[top - 1]->lchild = q;
+                }
+                else {
+                    path[top - 1]->rchild = q;
+                }
+                path[top] = q;
+                path[++top] = pp;
+            }
+            else {
+                // case3.2.2, bro是黑色的 且 bro的右孩子是红色的，左孩子是黑色的
+                if (bro->rchild && bro->rchild->color == 'r' && 
+                        (!bro->lchild || bro->lchild->color == 'b')) {
+                    bro->color = 'r';
+                    bro->rchild->color = 'b';
+                    q = Rotate(bro, "RR");
+                    pp->lchild = q;
+                }
+                // case3.2.3, bro是黑色的 且 bro的左孩子是红色的
+                else if (bro->lchild && bro->lchild->color == 'r') {
+                    bro->color = pp->color;
+                    pp->color = 'b';
+                    bro->lchild->color = 'b';
+                    q = Rotate(pp, "LL");
+                    if (!top) {
+                        *T = q;
+                    }
+                    else if (path[top - 1]->lchild == pp) {
+                        path[top - 1]->lchild = q;
+                    }
+                    else {
+                        path[top - 1]->rchild = q;
+                    }
+                    return 1;
+                }
+                // case3.2.3, bro是黑色的 且 bro的孩子都是黑色的
+                else {
+                    bro->color = 'r';
+                    if (!top || pp->color == 'r') {
+                        pp->color = 'b';
+                        return 1;                                
+                    }
+                    p = pp;
+                    pp = path[--top];
+                }
+            }
+        }
+    }
+    return 1;
 }

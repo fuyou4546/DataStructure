@@ -22,9 +22,9 @@ int AVL_Insert(AVLTree* T, int key);
 AVLTree AVL_Init(int* key, int n);
 int isAVL(AVLTree T);
 int AVL_Delete(AVLTree* T, int key);
-int AVL_Delete_Test(AVLTree* T, int key);
 
 RBNode* RB_Search(RBTree T, int key);
 int RB_Insert(RBTree* T, int key);
 RBTree RB_Init(int* key, int n);
 int isRB(RBTree T);
+int RB_Delete(RBTree* T, int key);

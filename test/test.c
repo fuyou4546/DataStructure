@@ -117,12 +117,12 @@ testData* randData(int x, int y, int n) {
     D->length = n;
     AVLTree T = NULL;
     int key = 0;
-    Sleep(10);
+    Sleep(5);
     srand(time(0));
     while (n) {
         key = rand() % (y - x + 1) + x;
-        if (!AVL_Search(T, key)) {
-            AVL_Insert(&T, key);
+        if (!RB_Search(T, key)) {
+            RB_Insert(&T, key);
             n--;
             D->seq[n] = key;
         }
@@ -193,9 +193,14 @@ void testAVL_single() {
 
 void testRB_single() {
     int dataNum = 20;
-    int data[] = {245, 622, 83, 143, 213, 179, 527, 127, 404, 43, 125, 616, 507, 851, 463, 992, 366, 520, 646, 795};
+    int data[] = {302, 974, 541, 123, 227, 831, 41, 472, 768, 284, 847, 921, 826, 521, 273, 735, 636, 853, 829, 101};
     RBTree T = RB_Init(data, dataNum);
-    int flag = isRB(T);
+    for (int i = 0; i < 10; i++) {
+        RB_Delete(&T, data[i]);
+        if (!isRB(T)) {
+            printf("%d ", data[i]);
+        }
+    }
 }
 
 void testRB() {
@@ -203,13 +208,16 @@ void testRB() {
     int dataStart = 0;
     int dataEnd = 1000;
     int dataNum = 100;
-    int deleteTimes = 20;
+    int deleteTimes = 99;
     FILE* fp = fopen("test/output.txt", "w");
     testData* D = NULL;
     RBTree T = NULL;
     for (int i = 0; i < testTimes; i++) {
         D = randData(dataStart, dataEnd, dataNum);
         T = RB_Init(D->seq, dataNum);
+        for (int i = 0; i < deleteTimes; i++) {
+            RB_Delete(&T, D->seq[i]);
+        }
         if (!isRB(T)) {
             for (int i = 0; i < dataNum - 1; i++) {
                 fprintf(fp, "%d, ", D->seq[i]);
@@ -223,6 +231,6 @@ void testRB() {
 void testSearch() {
     //testAVL();
     //testAVL_single();
-    //testRB_single();
     testRB();
+    //testRB();
 }
