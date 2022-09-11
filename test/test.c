@@ -228,9 +228,35 @@ void testRB() {
     fclose(fp);
 }
 
+void testSearchFunc() {
+    int dataNum = 20;
+    int data[] = {302, 974, 541, 123, 227, 831, 41, 472, 768, 284, 847, 921, 826, 521, 273, 735, 636, 853, 829, 101};
+    RBTree T = RB_Init(data, dataNum);
+    BST_inOrder(T);
+    printf("\n");
+    BST_addCount(T);
+    for (int i = 0; i < 20; i++) {
+        printf("%d ", BST_KthLess(T, i + 1)->data);
+    }
+}
+
+void testB_single() {
+    int dataNum = 20;
+    int data[] = {302, 974, 541, 123, 227, 831, 41, 472, 768, 284, 847, 921, 826, 521, 273, 735, 636, 853, 829, 101};
+    int m = 4;
+    BTree* T = B_Init(data, dataNum, m);
+    B_leOrder(T);
+}
+
+void testB() {
+
+}
+
 void testSearch() {
     //testAVL();
     //testAVL_single();
-    testRB();
+    //testRB_single();
     //testRB();
+    //testSearchFunc();
+    testB_single();
 }

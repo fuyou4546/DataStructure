@@ -18,6 +18,3 @@ void testTree();
 void testGraph();
 void testGraphFunc();
 void testSearch();
-testData* randData(int x, int y, int n);
-void testBST();
-void testAVL();

@@ -23,12 +23,20 @@ int Binary_Search_Recursion(SqList* L, int key) {
     return bsr(L, key, 1, L->length);
 }
 
+// -----------------BST-----------------
 
 int SgetHeight(SearchTree T) {
     if (!T) return 0;
     int hl = SgetHeight(T->lchild);
     int hr = SgetHeight(T->rchild);
     return (hl > hr ? hl : hr) + 1;
+}
+
+void BST_inOrder(BSTTree T) {
+    if (!T) return;
+    BST_inOrder(T->lchild);
+    printf("%d ", T->data);
+    BST_inOrder(T->rchild);
 }
 
 BSTNode* BST_Search(BSTTree T, int key) {
@@ -149,6 +157,50 @@ int isBST(BSTTree T) {
     return isbst(T, &max);
 }
 
+int BST_findMinAndMax(BSTTree T, int* minKey, int* maxKey) {
+    if (!T) return 0;
+    BSTTree p = T;
+    while (p && p->lchild) {
+        p = p->lchild;
+    }
+    *minKey = p->data;
+    p = T;
+    while (p && p->rchild) {
+        p = p->rchild;
+    }
+    *maxKey = p->data;
+    return 1;
+}
+
+void BST_printKeyGTE(BSTTree T, int k) {
+    if (!T) return;
+    BST_printKeyGTE(T->rchild, k);
+    if (T->data < k) return;
+    printf("%d ", T->data);
+    BST_printKeyGTE(T->lchild, k);
+}
+
+int BST_addCount(BSTTree T) {
+    if (!T) return -1;
+    int cl = BST_addCount(T->lchild);
+    int cr = BST_addCount(T->rchild);
+    return T->count = cl + cr + 2;
+}
+
+BSTNode* BST_KthLess(BSTTree T, int k) {
+    if (!T) return NULL;
+    if (!T->lchild) {
+        if (k == 1) return T;
+        return BST_KthLess(T->rchild, k - 1);
+    }
+    if (T->lchild->count + 2 == k) return T;
+    if (T->lchild->count + 2 < k) {
+        return BST_KthLess(T->rchild, k - T->lchild->count - 2);
+    }
+    return BST_KthLess(T->lchild, k);
+}
+
+// -----------------AVL-----------------
 
 AVLNode* AVL_Search(AVLTree T, int key) {
     return BST_Search(T, key);
@@ -298,6 +350,7 @@ int AVL_Delete(AVLTree* T, int key) {
     return 1;
 }
 
+// -----------------RB-----------------
 
 RBNode* RB_Search(RBTree T, int key) {
     return BST_Search(T, key);
@@ -597,4 +650,151 @@ int RB_Delete(RBTree* T, int key) {
         }
     }
     return 1;
+}
+
+// -----------------B-----------------
+
+int B_Search(BTree* T, int key) {
+    BNode* p = T->root;
+    int left = 0, right = p->n - 1, mid = 0;
+    while (p) {
+        while (left <= right) {
+            mid = (left + right) / 2;
+            if (p->key[mid] == key) return 1;
+            if (p->key[mid] < key) left = mid + 1;
+            else right = mid - 1;
+        }
+        p = p->child[left];
+    }
+    return 0;
+}
+
+int B_Insert(BTree* T, int key) {
+    BNode* p = T->root;
+    // 若树空
+    if (!p) {
+        BNode* root = malloc(sizeof(BNode));
+        root->child = calloc(T->m, sizeof(BNode*));
+        root->key = malloc((T->m - 1) * sizeof(int));
+        root->n = 1;
+        root->key[0] = key;
+        T->root = root;
+        T->size = 1;
+        return 1;
+    }
+    int left, right, mid;
+    BNode* path[MAX_LEN];
+    int top = -1;
+    // 记录路径, left保存插入位置
+    while (p) {
+        left = 0, right = p->n - 1;
+        while (left <= right) {
+            mid = (left + right) / 2;
+            if (p->key[mid] == key) return 0;
+            if (p->key[mid] < key) left = mid + 1;
+            else right = mid - 1;
+        }
+        path[++top] = p;
+        p = p->child[left];
+    }
+    T->size++;
+    BNode* q = path[top], *bn = NULL;
+    while (top != -1) {
+        // 将插入位置之后的键值和子树指针后移
+        for (int i = q->n - 1; i >= left; i--) {
+            q->key[i + 1] = q->key[i];
+            q->child[i + 2] = q->child[i + 1];
+        }
+        // 插入结点
+        q->n++;
+        q->key[left] = key;
+        q->child[left + 1] = bn;
+        if (q->n < T->m) break;
+        // 若插入后结点关键字数大于等于m-1 分裂
+        // bn为分裂出的结点, 保存后一半的键值和子树指针
+        bn = malloc(sizeof(BNode));
+        bn->child = calloc(T->m, sizeof(BNode*));
+        bn->key = malloc((T->m - 1) * sizeof(int));
+        bn->n = q->n - q->n / 2 - 1;
+        q->n /= 2;  
+        // key为要上移的键值, 要将其插入父结点中
+        key = q->key[q->n];
+        memcpy(bn->key, q->key + q->n + 1, bn->n * sizeof(int));
+        memcpy(bn->child, q->child + q->n + 1, (bn->n + 1) * sizeof(BNode*));
+        top--;
+        // 树根分裂
+        if (top == -1) {
+            BNode* root = malloc(sizeof(BNode));
+            root->child = calloc(T->m, sizeof(BNode*));
+            root->key = malloc((T->m - 1) * sizeof(int));
+            root->n = 1;
+            root->key[0] = key;
+            if (q->key[0] < bn->key[0]) {
+                root->child[0] = q;
+                root->child[1] = bn;
+            }
+            else {
+                root->child[0] = bn;
+                root->child[1] = q;
+            }
+            T->root = root;
+        }
+        // 查找key在父结点的插入位置
+        else {
+            q = path[top];
+            left = 0;
+            right = q->n - 1;
+            while (left <= right) {
+                mid = (left + right) / 2;
+                if (q->key[mid] < key) left = mid + 1;
+                else right = mid - 1;
+            }
+        }
+    }
+    return 1;
+}
+
+BTree* B_Init(int* key, int n, int m) {
+    BTree* T = calloc(1, sizeof(BTree));
+    T->m = m;
+    for (int i = 0; i < n; i++) {
+        B_Insert(T, key[i]);
+    }
+    return T;
+}
+
+void B_in(BNode* p) {
+    if (!p) return;
+    for (int i = 0; i < p->n; i++) {
+        B_in(p->child[i]);
+        printf("%d ", p->key[i]);
+    }
+    B_in(p->child[p->n]);
+}
+void B_inOrder(BTree* T) {
+    B_in(T->root);
+}
+
+void B_leOrder(BTree* T) {
+    BNode* p = NULL;
+    BNode** Q = malloc(T->size * sizeof(BNode*));
+    int front = 0, rear = 0, mark = 0;
+    Q[rear++] = T->root;
+    while (front != rear) {
+        mark = rear;
+        while (front != mark) {
+            p = Q[front++];
+            for (int i = 0; i < p->n; i++) {
+                printf("%d ", p->key[i]);
+                if (p->child[i]) {
+                    Q[rear++] = p->child[i];
+                }
+            }
+            printf("| ");
+            if (p->child[p->n]) {
+                Q[rear++] = p->child[p->n];
+            }
+        }
+        printf("\n");
+    }
 }

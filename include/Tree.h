@@ -12,8 +12,21 @@ typedef struct BiNode {
 typedef struct BiNode_Search {
     int data;
     char color;
+    int count;
     struct BiNode_Search* lchild, *rchild;
 } SearchNode, *SearchTree, BSTNode, AVLNode, RBNode, *BSTTree, *AVLTree, *RBTree;
+
+typedef struct BNode {
+    int n;
+    int* key;
+    struct BNode** child;
+} BNode;
+
+typedef struct {
+    int m;
+    BNode* root;
+    int size;
+} BTree;
 
 typedef struct {
     int data;
