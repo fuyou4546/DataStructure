@@ -34,8 +34,10 @@ RBTree RB_Init(int* key, int n);
 int isRB(RBTree T);
 int RB_Delete(RBTree* T, int key);
 
+int B_BinarySearch(int* L, int n, int key);
 int B_Search(BTree* T, int key);
 int B_Insert(BTree* T, int key);
 BTree* B_Init(int* key, int n, int m);
-void B_inOrder(BTree* T);
-void B_leOrder(BTree* T);
+int isB(BTree* T);
+void B_LeOrder(BTree* T);
+int B_Delete(BTree* T, int key);

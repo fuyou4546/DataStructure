@@ -669,6 +669,17 @@ int B_Search(BTree* T, int key) {
     return 0;
 }
 
+int B_BinarySearch(int* L, int n, int key) {
+    int left = 0, right = n - 1, mid = 0;
+    while (left <= right) {
+        mid = (left + right) / 2;
+        if (L[mid] == key) return mid;
+        if (L[mid] < key) left = mid + 1;
+        else right = mid - 1;
+    }
+    return left;
+}
+
 int B_Insert(BTree* T, int key) {
     BNode* p = T->root;
     // 若树空
@@ -682,33 +693,33 @@ int B_Insert(BTree* T, int key) {
         T->size = 1;
         return 1;
     }
-    int left, right, mid;
+    int cur, right, mid;
     BNode* path[MAX_LEN];
     int top = -1;
-    // 记录路径, left保存插入位置
+    // 记录路径, cur保存插入位置
     while (p) {
-        left = 0, right = p->n - 1;
-        while (left <= right) {
-            mid = (left + right) / 2;
+        cur = 0, right = p->n - 1;
+        while (cur <= right) {
+            mid = (cur + right) / 2;
             if (p->key[mid] == key) return 0;
-            if (p->key[mid] < key) left = mid + 1;
+            if (p->key[mid] < key) cur = mid + 1;
             else right = mid - 1;
         }
         path[++top] = p;
-        p = p->child[left];
+        p = p->child[cur];
     }
     T->size++;
     BNode* q = path[top], *bn = NULL;
     while (top != -1) {
         // 将插入位置之后的键值和子树指针后移
-        for (int i = q->n - 1; i >= left; i--) {
+        for (int i = q->n - 1; i >= cur; i--) {
             q->key[i + 1] = q->key[i];
             q->child[i + 2] = q->child[i + 1];
         }
         // 插入结点
         q->n++;
-        q->key[left] = key;
-        q->child[left + 1] = bn;
+        q->key[cur] = key;
+        q->child[cur + 1] = bn;
         if (q->n < T->m) break;
         // 若插入后结点关键字数大于等于m-1 分裂
         // bn为分裂出的结点, 保存后一半的键值和子树指针
@@ -742,13 +753,7 @@ int B_Insert(BTree* T, int key) {
         // 查找key在父结点的插入位置
         else {
             q = path[top];
-            left = 0;
-            right = q->n - 1;
-            while (left <= right) {
-                mid = (left + right) / 2;
-                if (q->key[mid] < key) left = mid + 1;
-                else right = mid - 1;
-            }
+            cur = B_BinarySearch(q->key, q->n, key);
         }
     }
     return 1;
@@ -763,19 +768,26 @@ BTree* B_Init(int* key, int n, int m) {
     return T;
 }
 
-void B_in(BNode* p) {
-    if (!p) return;
+void isb(BNode* p, int* MAX, int* flag, int m) {
+    if (!p || !*flag) return;
+    if (p->n >= m) *flag = 0;
     for (int i = 0; i < p->n; i++) {
-        B_in(p->child[i]);
-        printf("%d ", p->key[i]);
+        isb(p->child[i], MAX, flag, m);
+        if (i > 0 && p->key[i] <= p->key[i - 1] || p->key[i] <= *MAX) {
+            *flag = 0;
+        }
+        *MAX = p->key[i];
     }
-    B_in(p->child[p->n]);
+    isb(p->child[p->n], MAX, flag, m);
 }
-void B_inOrder(BTree* T) {
-    B_in(T->root);
+int isB(BTree* T) {
+    int MAX = INT_MIN;
+    int flag = 1;
+    isb(T->root, &MAX, &flag, T->m);
+    return flag;
 }
 
-void B_leOrder(BTree* T) {
+void B_LeOrder(BTree* T) {
     BNode* p = NULL;
     BNode** Q = malloc(T->size * sizeof(BNode*));
     int front = 0, rear = 0, mark = 0;
@@ -797,4 +809,73 @@ void B_leOrder(BTree* T) {
         }
         printf("\n");
     }
+}
+
+int B_Delete(BTree* T, int key) {
+    BNode* p = T->root, *q = NULL;
+    int m = T->m, top = -1;
+    BNode* path[MAX_LEN];
+    int cur[MAX_LEN];
+    int pcur = 0, qcur = 0;
+    while (p) {
+        path[++top] = p;
+        cur[top] = B_BinarySearch(p->key, p->n, key);
+        if (cur[top] < p->n && p->key[cur[top]] == key) {
+            q = p;
+            qcur = cur[top];
+            // 如果要删的结点不是终端节点, 用直接后继替代, 转为删除直接后继
+            p = p->child[qcur + 1];
+            while (p) {
+                path[++top] = p;
+                cur[top] = 0;
+                p = p->child[0];
+            }
+            q->key[qcur] = path[top]->key[0];
+        }
+        else p = p->child[cur[top]];
+    }
+    // 树空
+    if (top == -1) return 0;
+    T->size--;
+    // 根结点是终端结点
+    if (!top) {
+        p->n--;
+        if (!cur[top]) T->root = NULL;
+        else {
+            for (int i = cur[top]; i < path[top]->n; i++) {
+                path[top]->key[i] = path[top]->key[i + 1];
+            }
+        }
+        return 1;
+    }
+    while (1) {
+        p = path[top];
+        pcur = cur[top];
+        q = path[top - 1];
+        qcur = cur[top - 1];
+        BNode* bro = NULL;
+        // 要删的结点键值数 >= (m + 1)/2, 直接删
+        if (p->n >= (m + 1) / 2) {
+            p->n--;
+            for (int i = pcur; i < p->n; i++) {
+                p->key[i] = p->key[i + 1];
+                p->child[i] = p->child[i + 1];
+            }
+            p->child[p->n] = p->child[p->n + 1];
+            return 1;
+        }
+        // 要删的结点是双亲的最右子树
+        if (qcur == q->n) {
+            bro = q->child[qcur - 1];
+            // 左兄够借
+            if (bro->n >= (m + 1) / 2) {
+                p->child[p->n] = p->child[p->n - 1];
+                for (int i = p->n - 1; i > 0; i--) {
+                    p->key[i] = p->key[i - 1];
+                    p->child[i] = p->child[i - 1];
+                }
+            }
+        }
+    }
+    return 0;
 }

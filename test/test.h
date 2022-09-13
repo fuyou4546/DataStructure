@@ -18,3 +18,4 @@ void testTree();
 void testGraph();
 void testGraphFunc();
 void testSearch();
+void testSort();

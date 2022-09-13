@@ -117,7 +117,7 @@ testData* randData(int x, int y, int n) {
     D->length = n;
     AVLTree T = NULL;
     int key = 0;
-    Sleep(5);
+    Sleep(10);
     srand(time(0));
     while (n) {
         key = rand() % (y - x + 1) + x;
@@ -241,15 +241,38 @@ void testSearchFunc() {
 }
 
 void testB_single() {
-    int dataNum = 20;
-    int data[] = {302, 974, 541, 123, 227, 831, 41, 472, 768, 284, 847, 921, 826, 521, 273, 735, 636, 853, 829, 101};
+    int dataNum = 60;
+    int data[] = {935, 709, 151, 536, 998, 900, 44, 100, 606, 396, 782, 582, 117, 736, 439, 798, 801, 774, 992, 245, 353, 600, 203, 877, 577, 255, 901, 12, 3, 8, 787, 953, 400, 731, 397, 583, 945, 691, 940, 218, 756, 586, 607, 485, 333, 264, 843, 54, 300, 301, 876, 673, 646, 837, 288, 418, 268, 107, 85, 133};
     int m = 4;
     BTree* T = B_Init(data, dataNum, m);
-    B_leOrder(T);
+    B_LeOrder(T);
+    for (int i = 0; i < dataNum; i++) {
+        B_Delete(T, data[i]);
+        B_LeOrder(T);
+    }
 }
 
 void testB() {
-
+    int testTimes = 100;
+    int dataStart = 0;
+    int dataEnd = 1000;
+    int dataNum = 100;
+    int deleteTimes = 20;
+    FILE* fp = fopen("test/output.txt", "w");
+    testData* D = NULL;
+    BTree* T = NULL;
+    srand(time(0));
+    for (int i = 0; i < testTimes; i++) {
+        D = randData(dataStart, dataEnd, dataNum);
+        T = B_Init(D->seq, dataNum, rand() % 8 + 3);
+        if (!isB(T)) {
+            for (int i = 0; i < dataNum - 1; i++) {
+                fprintf(fp, "%d, ", D->seq[i]);
+            }
+            fprintf(fp, "%d\n", D->seq[dataNum - 1]);
+        }
+    }
+    fclose(fp);
 }
 
 void testSearch() {
@@ -258,5 +281,26 @@ void testSearch() {
     //testRB_single();
     //testRB();
     //testSearchFunc();
-    testB_single();
+    //testB_single();
+    //testB();
+}
+
+void testSort() {
+    int testTimes = 50;
+    int dataStart = 0;
+    int dataEnd = 1000;
+    int dataNum = 50;
+    FILE* fp = fopen("test/output.txt", "w");
+    testData* D = NULL;
+    for (int i = 0; i < testTimes; i++) {
+        D = randData(dataStart, dataEnd, dataNum);
+        binaryInsertionSort(D->seq, D->length);
+        if (!isAscending(D->seq, D->length)) {
+            for (int i = 0; i < dataNum - 1; i++) {
+                fprintf(fp, "%d, ", D->seq[i]);
+            }
+            fprintf(fp, "%d\n", D->seq[dataNum - 1]);
+        }
+    }
+    fclose(fp);
 }

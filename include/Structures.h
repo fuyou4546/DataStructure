@@ -10,5 +10,6 @@
 #include "Graph.h"
 #include "GraphFunc.h"
 #include "Search.h"
+#include "Sort.h"
 
 #endif
