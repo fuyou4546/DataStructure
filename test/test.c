@@ -112,21 +112,62 @@ void testGraphFunc() {
 }
 
 testData* randData(int x, int y, int n) {
+    srand(time(0));
     testData* D = malloc(sizeof(testData));
     D->seq = malloc(n * sizeof(int));
     D->length = n;
-    AVLTree T = NULL;
     int key = 0;
-    Sleep(10);
-    srand(time(0));
     while (n) {
-        key = rand() % (y - x + 1) + x;
+        // 高位低位拼接来产生大随机数
+        key = (rand() << 15) + rand();
+        key = key % (y - x + 1) + x;
+        n--;
+        D->seq[n] = key;
+    }
+    return D;
+}
+
+testData* randDataUnique(int x, int y, int n) {
+    testData* D = malloc(sizeof(testData));
+    D->seq = malloc(n * sizeof(int));
+    D->length = n;
+    RBTree T = NULL;
+    int key = 0;
+    while (n) {
+        // 高位低位拼接来产生大随机数
+        key = (rand() << 15) + rand();
+        key = key % (y - x + 1) + x;
+        // 红黑树去重
         if (!RB_Search(T, key)) {
             RB_Insert(&T, key);
             n--;
             D->seq[n] = key;
         }
     }
+    return D;
+}
+
+void writeRandData() {
+    int dataStart = 0;
+    int dataEnd = INT_MAX >> 8;
+    int dataNum = INT_MAX >> 11;
+    testData* D = randData(dataStart, dataEnd, dataNum);
+    FILE* fp = fopen("test/input.txt", "w");
+    for (int i = 0; i < D->length; i++) {
+        fprintf(fp, "%d ", D->seq[i]);
+    }
+    fclose(fp);
+}
+
+testData* readData(int n) {
+    testData* D = malloc(sizeof(testData));
+    D->length = 0;
+    D->seq = malloc(n * sizeof(int));
+    FILE* fp = fopen("test/input.txt", "r");
+    while(n-- && fscanf(fp, "%d", &D->seq[D->length]) != EOF) {
+        D->length++;
+    }
+    fclose(fp);
     return D;
 }
 
@@ -140,7 +181,7 @@ void testBST() {
     testData* D = NULL;
     BSTTree T = NULL;
     for (int i = 0; i < testTimes; i++) {
-        D = randData(dataStart, dataEnd, dataNum);
+        D = randDataUnique(dataStart, dataEnd, dataNum);
         T = BST_Init(D->seq, dataNum);
         for (int i = 0; i < deleteTimes; i++) {
             BST_Delete(&T, D->seq[i]);
@@ -165,7 +206,7 @@ void testAVL() {
     testData* D = NULL;
     AVLTree T = NULL;
     for (int i = 0; i < testTimes; i++) {
-        D = randData(dataStart, dataEnd, dataNum);
+        D = randDataUnique(dataStart, dataEnd, dataNum);
         T = AVL_Init(D->seq, dataNum);
         for (int i = 0; i < deleteTimes; i++) {
             AVL_Delete(&T, D->seq[i]);
@@ -213,7 +254,7 @@ void testRB() {
     testData* D = NULL;
     RBTree T = NULL;
     for (int i = 0; i < testTimes; i++) {
-        D = randData(dataStart, dataEnd, dataNum);
+        D = randDataUnique(dataStart, dataEnd, dataNum);
         T = RB_Init(D->seq, dataNum);
         for (int i = 0; i < deleteTimes; i++) {
             RB_Delete(&T, D->seq[i]);
@@ -263,7 +304,7 @@ void testB() {
     BTree* T = NULL;
     srand(time(0));
     for (int i = 0; i < testTimes; i++) {
-        D = randData(dataStart, dataEnd, dataNum);
+        D = randDataUnique(dataStart, dataEnd, dataNum);
         T = B_Init(D->seq, dataNum, rand() % 8 + 3);
         if (!isB(T)) {
             for (int i = 0; i < dataNum - 1; i++) {
@@ -285,16 +326,24 @@ void testSearch() {
     //testB();
 }
 
-void testSort() {
-    int testTimes = 50;
+void testSortTime(void (*func)(int*, int), int n) {
+    testData* D = readData(n);
+    clock_t start = clock();
+    func(D->seq, D->length);
+    clock_t end = clock();
+    printf("%3.3fs\n", (float)(end - start) / 1000);
+}
+
+void testSortAccuracy(void (*func)(int*, int)) {
+    int testTimes = 500;
     int dataStart = 0;
-    int dataEnd = 1000;
-    int dataNum = 50;
+    int dataEnd = 10000;
+    int dataNum = 1000;
     FILE* fp = fopen("test/output.txt", "w");
     testData* D = NULL;
     for (int i = 0; i < testTimes; i++) {
         D = randData(dataStart, dataEnd, dataNum);
-        binaryInsertionSort(D->seq, D->length);
+        func(D->seq, D->length);
         if (!isAscending(D->seq, D->length)) {
             for (int i = 0; i < dataNum - 1; i++) {
                 fprintf(fp, "%d, ", D->seq[i]);
@@ -303,4 +352,13 @@ void testSort() {
         }
     }
     fclose(fp);
+}
+
+void testSort() {
+    // writeRandData();
+    // testSortAccuracy(radixSort);
+    testSortTime(selectSort, 50000);
+    testSortTime(heapSort, 1000000);
+    testSortTime(quickSort, 1000000);
+    testSortTime(radixSort, 1000000);
 }

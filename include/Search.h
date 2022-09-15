@@ -3,7 +3,7 @@
 #include <string.h>
 #include "Structures.h"
 
-#define MAX_LEN 15
+#define MAX_LEN 20
 
 int Binary_Search(SqList* L, int key);
 int Binary_Search_Recursion(SqList* L, int key);

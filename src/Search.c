@@ -408,7 +408,7 @@ int RB_Insert(RBTree* T, int key) {
             else path[top - 2]->rchild = q;
             return 1;
         }
-        // case3.2, 叔结点是红结点, 
+        // case3.2, 叔结点是红结点
         // 染色, 将爷结点视为当前结点, 路径指针上移两层, 重复case1~3直到退出
         else {
             q->color = 'r';
