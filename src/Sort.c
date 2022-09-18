@@ -96,15 +96,15 @@ int partition(int* L, int left, int right) {
     L[left] = pivot;
     return left;
 }
-void qS(int* L, int left, int right) {
+void qSort(int* L, int left, int right) {
     if (left >= right) return;
     int pivotpos = partition(L, left, right);
-    qS(L, left, pivotpos - 1);
-    qS(L, pivotpos + 1, right);
+    qSort(L, left, pivotpos - 1);
+    qSort(L, pivotpos + 1, right);
 }
 void quickSort(int* L, int n) {
     srand(time(0));
-    qS(L, 0, n - 1);
+    qSort(L, 0, n - 1);
 }
 
 void selectSort(int* L, int n) {
@@ -228,4 +228,92 @@ void radixSort(int* L, int n) {
         }
         front[i] = rear[i] = NULL;
     }
+}
+
+void bidiBubbleSort(int* L, int n) {
+    int left = 0, right = n - 1, flag = 1, temp;
+    while (left < right) {
+        flag = 0;
+        for (int i = right; i > left; i--) {
+            if (L[i] < L[i - 1]) {
+                temp = L[i];
+                L[i] = L[i - 1];
+                L[i - 1] = temp;
+                flag = 1;
+            }
+        }
+        if (!flag) return;
+        left++;
+        for (int i = left; i < right; i++) {
+            if (L[i] > L[i + 1]) {
+                temp = L[i];
+                L[i] = L[i + 1];
+                L[i + 1] = temp;
+                flag = 1;
+            }
+        }
+        if (!flag) return;
+        right--;
+    }
+}
+
+void moveOddBeforeEven(int* L, int n) {
+    int i = 0, j = n - 1, temp;
+    while (i < j) {
+        while (i < j && L[i] & 1) i++;
+        while (i < j && !(L[j] & 1)) j--;
+        if (i < j) {
+            temp = L[i];
+            L[i] = L[j];
+            L[j] = temp;
+            i++;
+            j--;
+        }
+    }
+}
+
+int qSelect(int* L, int left, int right, int k) {
+    if (left >= right) return left;
+    int pos = partition(L, left, right);
+    if (pos == k) return L[k];
+    if (pos > k) return qSelect(L, left, pos - 1, k);
+    return qSelect(L, pos + 1, right, k);
+}
+int quickSelect(int* L, int n, int k) {
+    srand(time(0));
+    return qSelect(L, 0, n - 1, k);
+}
+
+void colorPartition(int* L, int n) {
+    int i = 0, j = 0, k = n - 1, temp;
+    while (j <= k) {
+        if (L[j] == 1) {
+            temp = L[j];
+            L[j] = L[i];
+            L[i] = temp;
+            i++;
+            j++;
+        }
+        else if (L[j] == 2) {
+            j++;
+        }
+        else {
+            temp = L[j];
+            L[j] = L[k];
+            L[k] = temp;
+            k--;
+        }
+    }
+}
+
+void setP(int* L, int mid, int left, int right) {
+    if (left >= right) return;
+    int pos = partition(L, left, right);
+    if (pos == mid) return;
+    if (pos > mid) setP(L, mid, left, pos - 1);
+    setP(L, mid, pos + 1, right);
+}
+int setPartition(int* L, int n) {
+    seP(L, n / 2, 0, n - 1);
+    return n / 2;
 }

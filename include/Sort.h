@@ -13,3 +13,8 @@ void selectSort(int* L, int n);
 void heapSort(int* L, int n);
 void mergeSort(int* L, int n);
 void radixSort(int* L, int n);
+void bidiBubbleSort(int* L, int n);
+void moveOddBeforeEven(int* L, int n);
+int quickSelect(int* L, int n, int k);
+void colorPartition(int* L, int n);
+int setPartition(int* L, int n);

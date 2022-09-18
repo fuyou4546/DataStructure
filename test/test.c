@@ -341,10 +341,12 @@ void testSortAccuracy(void (*func)(int*, int)) {
     int dataNum = 1000;
     FILE* fp = fopen("test/output.txt", "w");
     testData* D = NULL;
+    int flag = 1;
     for (int i = 0; i < testTimes; i++) {
         D = randData(dataStart, dataEnd, dataNum);
         func(D->seq, D->length);
         if (!isAscending(D->seq, D->length)) {
+            flag = 0;
             for (int i = 0; i < dataNum - 1; i++) {
                 fprintf(fp, "%d, ", D->seq[i]);
             }
@@ -352,13 +354,40 @@ void testSortAccuracy(void (*func)(int*, int)) {
         }
     }
     fclose(fp);
+    if (flag) printf("true\n");
+    else printf("false\n");
+
+void testSelectAccuracy(int (*func)(int*, int, int)) {
+    int testTimes = 50;
+    int dataStart = 0;
+    int dataEnd = 1000;
+    int dataNum = 100;
+    FILE* fp = fopen("test/output.txt", "w");
+    testData* D = NULL;
+    int flag = 1;
+    int k = 0, val = 0;
+    for (int i = 0; i < testTimes; i++) {
+        D = randData(dataStart, dataEnd, dataNum);
+        k = rand() % dataNum;
+        val = func(D->seq, D->length, k);
+        quickSort(D->seq, D->length);
+        if (D->seq[k] != val) {
+            flag = 0;
+            for (int i = 0; i < dataNum - 1; i++) {
+                fprintf(fp, "%d, ", D->seq[i]);
+            }
+            fprintf(fp, "%d\n", D->seq[dataNum - 1]);
+        }
+    }
+    fclose(fp);
+    if (flag) printf("true\n");
+    else printf("false\n");
 }
 
 void testSort() {
     // writeRandData();
-    // testSortAccuracy(radixSort);
-    testSortTime(selectSort, 50000);
-    testSortTime(heapSort, 1000000);
-    testSortTime(quickSort, 1000000);
-    testSortTime(radixSort, 1000000);
+    // testSortAccuracy(moveOddBeforeEven);
+    // testSortTime(bidiBubbleSort, 80000);
+    // testSortTime(bubbleSort, 80000);
+    testSelectAccuracy(quickSelect);
 }
