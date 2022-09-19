@@ -112,7 +112,7 @@ void testGraphFunc() {
 }
 
 testData* randData(int x, int y, int n) {
-    srand(time(0));
+    //srand(time(0));
     testData* D = malloc(sizeof(testData));
     D->seq = malloc(n * sizeof(int));
     D->length = n;
@@ -343,7 +343,7 @@ void testSortAccuracy(void (*func)(int*, int)) {
     testData* D = NULL;
     int flag = 1;
     for (int i = 0; i < testTimes; i++) {
-        D = randData(dataStart, dataEnd, dataNum);
+        D = randDataUnique(dataStart, dataEnd, dataNum);
         func(D->seq, D->length);
         if (!isAscending(D->seq, D->length)) {
             flag = 0;
@@ -356,6 +356,7 @@ void testSortAccuracy(void (*func)(int*, int)) {
     fclose(fp);
     if (flag) printf("true\n");
     else printf("false\n");
+}
 
 void testSelectAccuracy(int (*func)(int*, int, int)) {
     int testTimes = 50;
@@ -384,10 +385,71 @@ void testSelectAccuracy(int (*func)(int*, int, int)) {
     else printf("false\n");
 }
 
+void testSortFuncAccuracy() {
+    int testTimes = 50;
+    int dataStart = 0;
+    int dataEnd = 1000;
+    int dataNum = 100;
+    FILE* fp = fopen("test/output.txt", "w");
+    testData* D = NULL;
+    int flag = 1;
+    for (int i = 0; i < testTimes; i++) {
+        D = randData(dataStart, dataEnd, dataNum);
+        heapBuild(D->seq, D->length);
+        if (!isHeap(D->seq, D->length)) {
+            flag = 0;
+            for (int i = 0; i < dataNum - 1; i++) {
+                fprintf(fp, "%d, ", D->seq[i]);
+            }
+            fprintf(fp, "%d\n", D->seq[dataNum - 1]);
+        }
+    }
+    fclose(fp);
+    if (flag) printf("true\n");
+    else printf("false\n");
+}
+
+void testKMergeSortAccuracy() {
+    int testTimes = 50;
+    int dataStart = 0;
+    int dataEnd = 100000;
+    int dataNum = 1000;
+    int flag = 1;
+    FILE* fp = fopen("test/output.txt", "w");
+    testData* D;
+    srand(time(0));
+    for (int i = 0; i < testTimes; i++) {
+        int n = rand() % 5 + 10, total = 0;
+        int* len = malloc(n * sizeof(int));
+        int** L = malloc(n * sizeof(int*));
+        for (int j = 0; j < n; j++) {
+            len[j] = rand() % dataNum + dataNum;
+            total += len[j];
+            D = randData(dataStart, dataEnd, len[j]);
+            mergeSort(D->seq, D->length);
+            L[j] = D->seq;
+        }
+        int* res = malloc(total * sizeof(int));
+        kMergeSort(L, len, n, total, res);
+        if (!isAscending(res, total)) {
+            flag = 0;
+            for (int j = 0; j < dataNum - 1; j++) {
+                fprintf(fp, "%d, ", D->seq[j]);
+            }
+            fprintf(fp, "%d\n", D->seq[dataNum - 1]);
+        }
+    }
+    fclose(fp);
+    if (flag) printf("true\n");
+    else printf("false\n");
+}
+
 void testSort() {
     // writeRandData();
-    // testSortAccuracy(moveOddBeforeEven);
+    // testSortAccuracy(countSort);
     // testSortTime(bidiBubbleSort, 80000);
     // testSortTime(bubbleSort, 80000);
-    testSelectAccuracy(quickSelect);
+    // testSelectAccuracy(quickSelect);
+    // testSortFuncAccuracy();
+    testKMergeSortAccuracy();
 }

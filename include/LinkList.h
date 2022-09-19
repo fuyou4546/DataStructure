@@ -6,14 +6,15 @@
 #include "Others.h"
 
 typedef struct LNode {
+    int key;
     Data* data;
     struct LNode *next;
-}Link;
+} Link;
 
 typedef struct {
     Link* head, *tail;
     int len;
-}LinkList;
+} LinkList;
 
 Status MakeNode(Link** p, Data* d);
 void FreeNode(Link** p);

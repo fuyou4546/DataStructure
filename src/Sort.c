@@ -131,11 +131,14 @@ void heapAdjust(int* L, int k, int n) {
     }
     L[k - 1] = temp;
 }
-void heapSort(int* L, int n) {
-    // 自底向上建大顶堆
+void heapBuild(int* L, int n) {
     for (int i = n / 2; i > 0; i--) {
         heapAdjust(L, i, n);
     }
+}
+void heapSort(int* L, int n) {
+    // 自底向上建大顶堆
+    heapBuild(L, n);
     int temp;
     // 依次将堆顶元素与堆底元素交换, 调整除堆底的剩余堆
     for (int i = n - 1; i > 0; i--) {
@@ -314,6 +317,100 @@ void setP(int* L, int mid, int left, int right) {
     setP(L, mid, pos + 1, right);
 }
 int setPartition(int* L, int n) {
-    seP(L, n / 2, 0, n - 1);
+    setP(L, n / 2, 0, n - 1);
     return n / 2;
+}
+
+void selectSortLinkList(LinkList* L) {
+    Link* head = L->head;
+    Link* p, *pre, *mark, *mpre, *tail = head;
+    while (tail->next) {
+        p = mark = tail->next;
+        pre = mpre = tail;
+        while (p) {
+            if (p->key < mark->key) {
+                mark = p;
+                mpre = pre;
+            }
+            pre = p;
+            p = p->next;
+        }
+        mpre->next = mark->next;
+        mark->next = tail->next;
+        tail->next = mark;
+        tail = mark;
+    }
+}
+
+int isHeap(int* L, int n) {
+    int k = 0;
+    for (int i = 1; i <= n / 2; i++) {
+        k = i << 1;
+        if (k <= n && L[i - 1] < L[k - 1] ||
+                k + 1 <= n && L[i - 1] < L[k]) {
+            return 0;
+        }    
+    }
+    return 1;
+}
+
+void countSort(int* L, int n) {
+    int* S = malloc(n * sizeof(int));
+    int count = 0;
+    for (int i = 0; i < n; i++) {
+        count = 0;
+        for (int j = 0; j < n; j++) {
+            if (L[j] < L[i]) count++;
+        }
+        S[count] = L[i];
+    }
+    for (int i = 0; i < n; i++) L[i] = S[i];
+    free(S);
+}
+
+void loserTreeAdjust(int* leaf, int* loser, int k, int n) {
+    int temp;
+    // k一直是胜者的位置
+    for (int i = (k + n) / 2; i > 0; i /= 2) {
+        // 如果插入导致败者变化, 更新败者, k为新胜者位置
+        if (leaf[k] > leaf[loser[i]]) {
+            temp = k;
+            k = loser[i];
+            loser[i] = temp;
+        }
+    }
+    loser[0] = k;
+}
+void loserTreeBuild(int** L, int n, int* leaf, int* loser) {
+    // 自底向上调整
+    for (int i = n - 1; i >= 0; i--) {
+        loserTreeAdjust(leaf, loser, i, n);
+    }
+}
+void kMergeSort(int** L, int* len, int n, int total, int* res) {
+    int* cur = calloc(n, sizeof(int));
+    int* loser = malloc(n * sizeof(int));
+    int* leaf = malloc((n + 1) * sizeof(int));
+    // 设置虚拟最小值
+    leaf[n] = INT_MIN;
+    // 败者初始化为虚拟最小值坐标, 叶结点取各表首元
+    for (int i = 0; i < n; i++) {
+        loser[i] = n;
+        leaf[i] = L[i][0];
+    }
+    loserTreeBuild(L, n, leaf, loser);
+    int index = 0, k = 0;
+    // 依次将每轮胜者所在表的游标后移, 在原胜者位置插入该表新首元, 再调整该位置
+    while (k < total) {
+        index = loser[0];
+        res[k++] = L[index][cur[index]++];
+        if (cur[index] < len[index]) {
+            leaf[index] = L[index][cur[index]];
+        }
+        else leaf[index] = INT_MAX;
+        loserTreeAdjust(leaf, loser, index, n);
+    }
+    free(cur);
+    free(loser);
+    free(leaf);
 }
