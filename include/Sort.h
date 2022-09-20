@@ -3,6 +3,7 @@
 #include "Structures.h"
 #include <time.h>
 
+// 所有排序默认升序
 int isAscending(int* L, int n);
 void straightInsertionSort(int* L, int n);
 void binaryInsertionSort(int* L, int n);
@@ -22,4 +23,7 @@ int setPartition(int* L, int n);
 void selectSortLinkList(LinkList* L);
 int isHeap(int* L, int n);
 void countSort(int* L, int n);
-void kMergeSort(int** L, int* len, int n, int total, int* res);
+// 将r个长len[i]的归并段L[i]归并为总长total的升序列res
+void kMergeSort(int** L, int* len, int r, int total, int* res);
+// 将L划分为r个归并段, 段res[i]长len[i]
+void replaceSelectSort(int* L, int n, int w, int** res, int* len, int* r);

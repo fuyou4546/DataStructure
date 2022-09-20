@@ -112,7 +112,7 @@ void testGraphFunc() {
 }
 
 testData* randData(int x, int y, int n) {
-    //srand(time(0));
+    srand(time(0));
     testData* D = malloc(sizeof(testData));
     D->seq = malloc(n * sizeof(int));
     D->length = n;
@@ -128,6 +128,7 @@ testData* randData(int x, int y, int n) {
 }
 
 testData* randDataUnique(int x, int y, int n) {
+    srand(time(0));
     testData* D = malloc(sizeof(testData));
     D->seq = malloc(n * sizeof(int));
     D->length = n;
@@ -138,8 +139,7 @@ testData* randDataUnique(int x, int y, int n) {
         key = (rand() << 15) + rand();
         key = key % (y - x + 1) + x;
         // 红黑树去重
-        if (!RB_Search(T, key)) {
-            RB_Insert(&T, key);
+        if (RB_Insert(&T, key)) {
             n--;
             D->seq[n] = key;
         }
@@ -415,9 +415,7 @@ void testKMergeSortAccuracy() {
     int dataEnd = 100000;
     int dataNum = 1000;
     int flag = 1;
-    FILE* fp = fopen("test/output.txt", "w");
     testData* D;
-    srand(time(0));
     for (int i = 0; i < testTimes; i++) {
         int n = rand() % 5 + 10, total = 0;
         int* len = malloc(n * sizeof(int));
@@ -431,17 +429,26 @@ void testKMergeSortAccuracy() {
         }
         int* res = malloc(total * sizeof(int));
         kMergeSort(L, len, n, total, res);
-        if (!isAscending(res, total)) {
-            flag = 0;
-            for (int j = 0; j < dataNum - 1; j++) {
-                fprintf(fp, "%d, ", D->seq[j]);
-            }
-            fprintf(fp, "%d\n", D->seq[dataNum - 1]);
-        }
+        if (!isAscending(res, total)) flag = 0;
     }
-    fclose(fp);
     if (flag) printf("true\n");
     else printf("false\n");
+}
+
+void testReplaceSelectSort() {
+    int testTimes = 50;
+    int dataStart = 0;
+    int dataEnd = 1000;
+    int dataNum = 100;
+    testData* D = randData(dataStart, dataEnd, dataNum);
+    int w = 10;
+    int** res = malloc(w * sizeof(int*));
+    for (int i = 0; i < w; i++) {
+        res[i] = malloc(4 * w * sizeof(int));
+    }
+    int* len = calloc(w, sizeof(int));
+    int r = 0;
+    replaceSelectSort(D->seq, D->length, w, res, len, &r);
 }
 
 void testSort() {
@@ -451,5 +458,6 @@ void testSort() {
     // testSortTime(bubbleSort, 80000);
     // testSelectAccuracy(quickSelect);
     // testSortFuncAccuracy();
-    testKMergeSortAccuracy();
+    // testKMergeSortAccuracy();
+    testReplaceSelectSort();
 }

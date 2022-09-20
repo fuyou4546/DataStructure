@@ -382,15 +382,6 @@ void loserTreeAdjust(int* leaf, int* loser, int k, int n) {
     loser[0] = k;
 }
 void loserTreeBuild(int** L, int n, int* leaf, int* loser) {
-    // 自底向上调整
-    for (int i = n - 1; i >= 0; i--) {
-        loserTreeAdjust(leaf, loser, i, n);
-    }
-}
-void kMergeSort(int** L, int* len, int n, int total, int* res) {
-    int* cur = calloc(n, sizeof(int));
-    int* loser = malloc(n * sizeof(int));
-    int* leaf = malloc((n + 1) * sizeof(int));
     // 设置虚拟最小值
     leaf[n] = INT_MIN;
     // 败者初始化为虚拟最小值坐标, 叶结点取各表首元
@@ -398,19 +389,73 @@ void kMergeSort(int** L, int* len, int n, int total, int* res) {
         loser[i] = n;
         leaf[i] = L[i][0];
     }
-    loserTreeBuild(L, n, leaf, loser);
-    int index = 0, k = 0;
+    // 自底向上调整
+    for (int i = n - 1; i >= 0; i--) {
+        loserTreeAdjust(leaf, loser, i, n);
+    }
+}
+void kMergeSort(int** L, int* len, int r, int total, int* res) {
+    int* cur = calloc(r, sizeof(int));
+    int* loser = malloc(r * sizeof(int));
+    int* leaf = malloc((r + 1) * sizeof(int));
+    loserTreeBuild(L, r, leaf, loser);
+    int index = 0, count = 0;
     // 依次将每轮胜者所在表的游标后移, 在原胜者位置插入该表新首元, 再调整该位置
-    while (k < total) {
+    while (count < total) {
         index = loser[0];
-        res[k++] = L[index][cur[index]++];
+        res[count++] = L[index][cur[index]++];
         if (cur[index] < len[index]) {
             leaf[index] = L[index][cur[index]];
         }
         else leaf[index] = INT_MAX;
-        loserTreeAdjust(leaf, loser, index, n);
+        loserTreeAdjust(leaf, loser, index, r);
     }
     free(cur);
     free(loser);
     free(leaf);
+}
+
+
+void loserTreeAdjustWithSeg(int* leaf, int* loser, int k, int w, int* seg) {
+    int temp;
+    for (int i = (k + w) / 2, j = loser[i]; i > 0; i /= 2, j = loser[i]) {
+        // 段号小者或段号相同键值小者为胜
+        if (seg[k] > seg[j] || seg[k] == seg[j] && leaf[k] > leaf[j]) {
+            temp = k;
+            k = j;
+            loser[i] = temp;
+        }
+    }
+    loser[0] = k;
+}
+void replaceSelectSort(int* L, int n, int w, int** res, int* len, int* r) {
+    int* loser = malloc(w * sizeof(int));
+    int* leaf = malloc((w + 1) * sizeof(int));
+    int* seg = calloc(w, sizeof(int));
+    leaf[w] = INT_MIN;
+    int cur = 0;
+    for (cur; cur < w; cur++) {
+        loser[cur] = w;
+        leaf[cur] = L[cur];
+    }
+    int minimax = INT_MIN;
+    for (int i = w - 1; i >= 0; i--) {
+        loserTreeAdjustWithSeg(leaf, loser, i, w, seg);
+    }
+    int index = 0, count = 0;
+    while (count < n) {
+        index = loser[0];
+        minimax = leaf[index];
+        // 按段分配
+        res[seg[index]][len[seg[index]]++] = minimax;
+        // 若新加入败者树的键值小于minimax, 将其划分到下一段
+        if (L[cur] < minimax) {
+            seg[index]++;
+            if (seg[index] > *r) *r = seg[index];
+        }
+        count++;
+        if (cur < n) leaf[index] = L[cur++];
+        else leaf[index] = INT_MAX;
+        loserTreeAdjustWithSeg(leaf, loser, index, w, seg);
+    }
 }
