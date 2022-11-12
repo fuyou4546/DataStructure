@@ -1,0 +1,17 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include "../include/Structures.h"
+
+typedef struct {
+    char c;
+    short s;
+    int i;
+} D;
+
+typedef struct {
+    char c;
+    int i;
+    short s;
+} E;
+
+void DS

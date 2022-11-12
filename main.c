@@ -1,5 +1,6 @@
 #include "./test/test.h"
 #include "./include/kmp.h"
+#include "./solutions/solution.c"
 
 int fab(int k, int m) {
     int* dp = (int*)calloc(m + 1, sizeof(int));
@@ -116,5 +117,6 @@ int main() {
     //testSLinkList();
     //testPolynomial();
     //testSearch();
-    testSort();
+    //testSort();
+    solution();
 }
