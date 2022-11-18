@@ -27,8 +27,9 @@ void getNextval(char* p, int* next) {
     }
 }
 
-int getIndex(char* s, char* p) {
-    int* next = (int*)malloc(strlen(p) * sizeof(int));
+int* getIndex(char* s, char* p) {
+    int* next = malloc(strlen(p) * sizeof(int));
+    int* mark = malloc(strlen(s) * sizeof(int));
     getNextval(p, next);
     int i = 0, j = 0, count = 0;
     while (s[i]) {
@@ -37,13 +38,14 @@ int getIndex(char* s, char* p) {
             j++;
             if (!p[j]) {
                 printf("%d\n", i - j);
-                count++;
-                i = i - j + 1;
+                mark[++count] = i - j;
+                i -= j - 1;
                 j = 0;
             }
         }
         else j = next[j];
     }
     free(next);
-    return count;
+    mark[0] = count;
+    return mark;
 }

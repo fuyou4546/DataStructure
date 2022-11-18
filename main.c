@@ -118,5 +118,6 @@ int main() {
     //testPolynomial();
     //testSearch();
     //testSort();
-    solution();
+    //solution();
+    testGraph();
 }

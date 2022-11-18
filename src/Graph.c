@@ -345,6 +345,22 @@ int MLAddArc(MulListGraph* G, int x, int y) {
     G->arcnum++;
     return 1;
 }
+int MLAddArcWithIdAndWeight(MulListGraph* G, int x, int y, int id, int weight) {
+    if (MLIsAdj(G, x, y)) return 0;
+    if (!MLIsVex(G, x)) MLInsertVex(G, x);
+    if (!MLIsVex(G, y)) MLInsertVex(G, y);
+    MulArcNode* p = calloc(1, sizeof(MulArcNode));
+    p->ivex = x;
+    p->jvex = y;
+    p->id = id;
+    p->weight = weight;
+    p->ilink = G->vertices[x].firstedge;
+    G->vertices[x].firstedge = p;
+    p->jlink = G->vertices[y].firstedge;
+    G->vertices[y].firstedge = p;
+    G->arcnum++;
+    return 1;
+}
 int MLRemoveArc(MulListGraph* G, int x, int y) {
     // if (!MLIsAdj(G, x, y)) return 0;
     MulArcNode* p = G->vertices[x].firstedge, *pre = NULL;
@@ -455,6 +471,14 @@ MulListGraph* MLInitGraph(int* inode, int* jnode, int n) {
     MulListGraph* G = calloc(1, sizeof(MulListGraph));
     for (int i = 0; i < n; i++) {
         MLAddArc(G, inode[i], jnode[i]);
+    }
+    return G;
+}
+
+MulListGraph* MLInitWithIdAndWeight(int* inode, int* jnode, int* weight, int n) {
+    MulListGraph* G = calloc(1, sizeof(MulListGraph));
+    for (int i = 0; i < n; i++) {
+        MLAddArcWithIdAndWeight(G, inode[i], jnode[i], i + 1, weight[i]);
     }
     return G;
 }

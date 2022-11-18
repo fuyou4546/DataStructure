@@ -76,3 +76,5 @@ int getCSHeight(CSTree T);
 CSTree buildCSTree(int* in, int* degree);
 int** getDataWay(BiTree T, int data);
 int countNode(BiTree T);
+BiTree preAndInBuildTree(int* pre, int* in, int n);
+CSTree buildCSTree2(int* in, int* degree, int n);

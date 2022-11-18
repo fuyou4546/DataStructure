@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MaxVerTexNum 20
+#define MaxVertexNum 20
 
 // 邻接矩阵
 typedef struct {
-    int Vex[MaxVerTexNum];
-    int Edge[MaxVerTexNum][MaxVerTexNum];
+    int Vex[MaxVertexNum];
+    int Edge[MaxVertexNum][MaxVertexNum];
     int vexnum, arcnum;
 } MatGraph;
 int MatIsVex(MatGraph* G, int x);
@@ -27,7 +27,7 @@ typedef struct ArcNode {
 typedef struct {
     int data;
     ArcNode *first;
-} VexNode, AdjList[MaxVerTexNum];
+} VexNode, AdjList[MaxVertexNum];
 typedef struct {
     AdjList vertices;
     int vexnum, arcnum;
@@ -52,7 +52,7 @@ typedef struct OrthArcNode {
 typedef struct {
     int data;
     OrthArcNode* firstin, *firstout;
-} OrthVexNdoe, OrthList[MaxVerTexNum];
+} OrthVexNdoe, OrthList[MaxVertexNum];
 typedef struct {
     OrthList vertices;
     int vexnum, arcnum;
@@ -72,15 +72,15 @@ OrthListGraph* OrthInitWithIdAndWeight(int* inode, int* jnode, int* weight, int 
 
 // 多重链表
 typedef struct MulArcNode {
-    int mark;
+    int id;
     int ivex, jvex;
     struct MulArcNode* ilink, *jlink;
-    int info;
+    int weight;
 } MulArcNode;
 typedef struct {
     int data;
     MulArcNode* firstedge;
-} MulVexNode, MulList[MaxVerTexNum];
+} MulVexNode, MulList[MaxVertexNum];
 typedef struct {
     MulList vertices;
     int vexnum, arcnum;
@@ -95,3 +95,4 @@ int MLFirstNeighbor(MulListGraph* G, int x);
 int MLNextNeighbor(MulListGraph* G, int x, int y);
 int MLDegree(MulListGraph* G, int x);
 MulListGraph* MLInitGraph(int* inode, int* jnode, int n);
+MulListGraph* MLInitWithIdAndWeight(int* inode, int* jnode, int* weight, int n);

@@ -14,7 +14,7 @@ MatGraph* AdjListToMat(AdjListGraph* G) {
     return M;
 }
 
-int haveELpath(MatGraph* G) {
+int isEL(MatGraph* G) {
     int count = 0, degree = 0;
     for (int i = 1; i <= G->vexnum; i++) {
         for (int j = i; j <= G->vexnum; j++) {
@@ -52,7 +52,7 @@ void ALBFS(AdjListGraph* G) {
     free(visited);
 }
 
-int* singleShortestPath(AdjListGraph* G, int u) {
+int* ALsingleShortestPath(AdjListGraph* G, int u) {
     int* path = malloc((G->vexnum + 1) * sizeof(int));
     for (int i = 1; i <= G->vexnum; i++) path[i] = INT_MAX;
     int* Q = malloc((G->vexnum + 1) * sizeof(int));
@@ -123,6 +123,7 @@ int ALGraphIsTree(AdjListGraph* G) {
     // return dfsGIT(G, visited, &count, &flag, 1, 0);
     dfsGIT2(G, visited, &vexnum, &edgenum, 1);
     free(visited);
+    // 连通 且 度=(顶点数-1)*2
     return vexnum == G->vexnum && edgenum == (vexnum - 1) * 2;
 }
 
@@ -133,9 +134,11 @@ void ALDFSwS(AdjListGraph* G, int* visited, int u) {
     st[++top] = u;
     while (top != -1) {
         p = st[top--];
+        visited[p] = 1;
         printf("%d ", p);
         for (ArcNode* v = G->vertices[p].first; v; v = v->next) {
             if (!visited[v->adjvex]) {
+                // 必须在for内标记, 避免再次入栈
                 visited[v->adjvex] = 1;
                 st[++top] = v->adjvex;
             }
@@ -146,7 +149,9 @@ void ALDFSwS(AdjListGraph* G, int* visited, int u) {
 void ALDFSwithStack(AdjListGraph* G) {
     int* visited = calloc(1 + G->vexnum, sizeof(int));
     for (int i = 1; i <= G->vexnum; i++) {
-        ALDFSwS(G, visited, i);
+        if (G->vertices[i].data) {
+            ALDFSwS(G, visited, i);
+        }
     }
     free(visited);
 }
@@ -183,7 +188,7 @@ int havePath_dfs(AdjListGraph* G, int* visited, int u, int v) {
 }
 int ALhavePath(AdjListGraph* G, int u, int v, int mode) {
     int* visited = calloc(G->vexnum + 1, sizeof(int));
-    if (mode == 1) return havePath_bfs(G, visited, u, v);
+    if (mode == 1) havePath_bfs(G, visited, u, v);
     return havePath_dfs(G, visited, u, v);
 }
 
@@ -214,14 +219,14 @@ int* Prim(MatGraph* G) {
     int* visited = calloc(G->vexnum + 1, sizeof(int));
     // dist[i] = d 表示在{V-T}中, 距离{T}最近的
     int* dist = malloc((G->vexnum + 1) * sizeof(int));
-    int* path = malloc((1 + G->vexnum * sizeof(int)));
+    int* path = malloc((G->vexnum + 1) * sizeof(int));
     for (int i = 1; i <= G->vexnum; i++) dist[i] = INT_MAX;
     // 任选一顶点作为起始点加入T
     int u = 1, w = 0;
     visited[u] = 1;
     dist[u] = 0;
     path[u] = 0;
-    // 循环 顶点数-1 次即可形成MST
+    // 循环顶点数-1次(再加入n-1个顶点)即可形成MST
     for (int i = 1; i < G->vexnum; i++) {
         w = INT_MAX;
         for (int j = 1; j <= G->vexnum; j++) {
@@ -244,9 +249,53 @@ int* Prim(MatGraph* G) {
     return path;
 }
 
-// todo 堆排序
-int* Kruskal(AdjListGraph* G) {
-
+void KheapAdjust(MulArcNode** heap, int k, int n) {
+    MulArcNode* temp = heap[k];
+    for (int i = 2 * k; i <= n; i *= 2) {
+        if (i < n && heap[i]->weight > heap[i + 1]->weight) {
+            i++;
+        }
+        if (temp->weight <= heap[i]->weight) {
+            break;
+        }
+        heap[k] = heap[i];
+        k = i;
+    }
+    heap[k] = temp;
+}
+void KheapBuild(MulArcNode** heap, int n) {
+    for (int i = n / 2; i > 0; i--) {
+        KheapAdjust(heap, i, n);
+    }
+}
+int* Kruskal(MulListGraph* G) {
+    MulArcNode** heap = malloc((G->arcnum + 1) * sizeof(MulArcNode*));
+    int* path = calloc(G->vexnum + 1, sizeof(int));
+    int count = 0;
+    for (int i = 1; i <= G->vexnum; i++) {
+        for (MulArcNode* p = G->vertices[i].firstedge; p;) {
+            if (p->ivex == i) {
+                heap[++count] = p;
+                p = p->ilink;
+            }
+            else p = p->jlink;
+        }
+    }
+    KheapBuild(heap, G->arcnum);
+    UFinit();
+    MulArcNode* temp = NULL;
+    count = 0;
+    for (int i = G->arcnum; count < G->vexnum - 1; i--) {
+        temp = heap[1];
+        if (UFfind(temp->ivex) != UFfind(temp->jvex)) {
+            UFmerge(temp->ivex, temp->jvex);
+            path[count++] = temp->id;
+        }
+        heap[1] = heap[i];
+        heap[i] = temp;
+        KheapAdjust(heap, 1, i - 1);
+    }
+    return path;
 }
 
 int* Dijkstra(MatGraph* G, int u) {

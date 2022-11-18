@@ -23,16 +23,17 @@ void DS21(BiTree T, int* dst, int index) {
 
 void testDS21() {
     int* dst = calloc(101, sizeof(int));
-    BiNode node10 = {10, NULL, NULL, 0, 0}, node9 = {-8, NULL, NULL, 0, 0}, node8 = {8, NULL, &node10, 0, 0};
+    BiNode node10 = {10, NULL, NULL, 0, 0}, node9 = {9, NULL, NULL, 0, 0}, node8 = {8, NULL, &node10, 0, 0};
     BiNode node7 = {7, NULL, &node9, 0, 0}, node6 = {6, &node8, NULL, 0, 0}, node5 = {5, &node6, &node7, 0, 0};
     BiNode node4 = {4, NULL, NULL, 0, 0}, node3 = {3, NULL, NULL, 0, 0}, node2 = {2, &node4, &node5, 0, 0};
     BiNode node1 = {1, &node2, &node3, 0, 0};
     BiTree root = &node1;
-    DS21(root, dst, 1);
-    for (int i = 1; i <= 100; i++) {
-        printf("%d ", dst[i]);
-        if (!(i % 10)) printf("\n");
-    }
+    // DS21(root, dst, 1);
+    // for (int i = 1; i <= 100; i++) {
+    //     printf("%d ", dst[i]);
+    //     if (!(i % 10)) printf("\n");
+    // }
+    printf("%d", getWPL(root));
 }
 
 void testFILE() {
@@ -131,8 +132,80 @@ void testChangeLink() {
     }
 }
 
+int s1[100], s2[100];
+int top1 = -1, top2 = -1;
+void stackQueue(int mode, int x) {
+    if (!mode) {
+        if (top1 != 99) {
+            s1[++top1] = x;
+            printf("入队成功\n");
+        }
+        else {
+            if (top2 == -1) {
+                while (top1 != -1) {
+                    s2[++top2] = s1[top1--];
+                }
+                s1[++top1] = x;
+                printf("入队成功\n");
+            }
+            else printf("队列满\n");
+        }
+    }
+    else {
+        if (top2 != -1) {
+            printf("%d出队\n", s2[top2--]);
+        }
+        else {
+            if (top1 == 99) {
+                while (top2 != 99) {
+                    s2[++top2] = s1[top1--];
+                }
+                printf("%d出队\n", s2[top2--]);
+            }
+            else printf("队列空\n");
+        }
+    }
+}
+
+Link* front = NULL, *rear = NULL;
+void linkCircularQueue(int mode, int x) {
+    if (!mode) {
+        front = rear = malloc(sizeof(Link));
+        rear->next = front;
+    }
+    if (mode == 1) {
+        if (rear->next == front) {
+            Link* node = malloc(sizeof(Link));
+            node->next = front;
+            rear->next = node;
+        }
+        rear->key = x;
+        rear = rear->next;
+    }
+    if (mode == 2) {
+        if (front == rear) {
+            printf("队列空\n");
+        }
+        else {
+            front = front->next;
+        }
+    }
+}
+
+void testKMP() {
+    char* pat = "abcabbcaa";
+    int len = strlen(pat);
+    int* next = malloc(len * sizeof(int));
+    getNext(pat, next);
+    for (int i = 0; i < len; i++) {
+        printf("%d ", next[i]);
+    }
+}
+
 void solution() {
     // printf("%d", C21(1, 29, 2));
     // testFILE();
-    testChangeLink();
+    // testChangeLink();
+    // testKMP();
+    testDS21();
 }

@@ -289,16 +289,17 @@ BiNode* inPostPreNode(BiNode* p) {
     return NULL;
 }
 
-void getW(BiTree T, int h, int* w) {
-    if (!T) return;
-    if (!T->lchild && !T->rchild) *w += T->data * h;
-    getW(T->lchild, h + 1, w);
-    getW(T->rchild, h + 1, w);
+int getW(BiTree T, int h) {
+    static int wpl = 0;
+    if (!T->lchild && !T->rchild) {
+        wpl += T->data * h;
+    }
+    if (T->lchild) getW(T->lchild, h + 1);
+    if (T->rchild) getW(T->rchild, h + 1);
+    return wpl;
 }
 int getWPL(BiTree T) {
-    int w = 0;
-    getW(T, 0, &w);
-    return w;
+    return getW(T, 0);
 }
 
 void printIOE(BiTree T, int h) {
@@ -387,10 +388,14 @@ int** getDataWay(BiTree T, int data) {
 }
 
 void UFinit() {
-    for (int i = 0; i < MAX_TREE_SIZE; i++) UFset[i] = i;
+    for (int i = 0; i < MAX_TREE_SIZE; i++) {
+        UFset[i] = i;
+    }
 }
 int UFfind(int x) {
-    if (x = UFset[x]) return x;
+    if (x == UFset[x]) {
+        return x;
+    }
     return UFset[x] = UFfind(UFset[x]);
 }
 void UFmerge(int x, int y) {
@@ -400,4 +405,42 @@ void UFmerge(int x, int y) {
 int countNode(BiTree T) {
     if (!T) return 0;
     return countNode(T->lchild) + countNode(T->rchild) + 1;
+}
+
+BiTree build(int* pre, int* in, int* mark, int pl, int pr, int il, int ir) {
+    if (pl > pr) return NULL;
+    BiNode* node = malloc(sizeof(BiNode));
+    node->data = pre[pl];
+    int index = mark[pre[pl]];
+    node->lchild = build(pre, in, mark, pl + 1, pl + index - il, il, index - 1);
+    node->rchild = build(pre, in, mark, pl + index - il + 1, pr, index + 1, ir);
+    return node;
+}
+BiTree preAndInBuildTree(int* pre, int* in, int n) {
+    int* mark = malloc(n * sizeof(int));
+    for (int i = 0; i < n; i++) {
+        mark[in[i]] = i;
+    }
+    return build(pre, in, mark, 0, n - 1, 0, n - 1);
+}
+
+CSTree buildCSTree2(int* in, int* degree, int n) {
+    CSTree* pointer = calloc(n, sizeof(CSTree));
+    for (int i = 0; i < n; i++) {
+        pointer[i]->data = in[i];
+    }
+    // 孩子结点的索引
+    int cur = 0;
+    for (int i = 0; i < n; i++) {
+        if (degree[i]) {
+            // 双亲i连接首孩子cur
+            cur++;
+            pointer[i]->firstchild = pointer[cur];
+            for (int j = 1; j < degree[i]; j++) {
+                // 孩子cur依次连接兄弟cur+1
+                cur++;
+                pointer[cur - 1]->nextsibling = pointer[cur];
+            }
+        }
+    }
 }

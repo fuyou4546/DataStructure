@@ -82,18 +82,25 @@ void testTree() {
 }
 
 void testGraph() {
-    int inode[] = {1,1,2,3,3,4,5,5,6};
-    int jnode[] = {2,4,5,6,5,2,4,3,1};
-    AdjListGraph* GA = ALInitGraph(inode, jnode, 9);
-    ALDeleteVex(GA, 2);
-    MatGraph *GMat = MatInitGraph(inode, jnode, 9);
-    MatDeleteVex(GMat, 2);
-    OrthListGraph* GO = OrthInitGraph(inode, jnode, 9);
-    int d = OrthInDegree(GO, 6);
-    OrthDeleteVex(GO, 2);
-    int p = OrthOutDegree(GO, 4);
-    MulListGraph* GMul = MLInitGraph(inode, jnode, 9);
-    MLDeleteVex(GMul, 5);
+    // int inode[] = {1,1,2,3,3,4,5,5,6};
+    // int jnode[] = {2,4,5,6,5,2,4,3,1};
+    // AdjListGraph* GA = ALInitGraph(inode, jnode, 9);
+    // ALDeleteVex(GA, 6);
+    // MatGraph *GMat = MatInitGraph(inode, jnode, 9);
+    // MatDeleteVex(GMat, 2);
+    // OrthListGraph* GO = OrthInitGraph(inode, jnode, 9);
+    // int d = OrthInDegree(GO, 6);
+    // OrthDeleteVex(GO, 2);
+    // int p = OrthOutDegree(GO, 4);
+    int inode[] = {1,1,2,3,3,2,3,4,5,1};
+    int jnode[] = {2,4,5,6,5,3,4,6,6,3};
+    int weight[] = {6,5,5,4,6,5,5,2,6,1};
+    int arcnum = sizeof(inode)/sizeof(int);
+    MulListGraph* GMul = MLInitWithIdAndWeight(inode, jnode, weight, arcnum);
+    int* path = Kruskal(GMul);
+    for (int i = 0; i < GMul->vexnum - 1; i++) {
+        printf("(%d,%d) ", inode[path[i] - 1], jnode[path[i] - 1]);
+    }
 }
 
 void testGraphFunc() {
