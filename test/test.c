@@ -156,8 +156,8 @@ testData* randDataUnique(int x, int y, int n) {
 
 void writeRandData() {
     int dataStart = 0;
-    int dataEnd = INT_MAX >> 8;
-    int dataNum = INT_MAX >> 11;
+    int dataEnd = INT_MAX >> 1;
+    int dataNum = INT_MAX >> 6;
     testData* D = randData(dataStart, dataEnd, dataNum);
     FILE* fp = fopen("test/input.txt", "w");
     for (int i = 0; i < D->length; i++) {
@@ -179,36 +179,43 @@ testData* readData(int n) {
 }
 
 void testBST() {
-    int testTimes = 500;
+    int testTimes = 5;
     int dataStart = 0;
-    int dataEnd = 1000;
-    int dataNum = 50;
-    int deleteTimes = 10;
+    int dataEnd = 1000000;
+    int dataNum = 5000;
+    int deleteTimes = 2000;
     FILE* fp = fopen("test/output.txt", "w+");
     testData* D = NULL;
     BSTTree T = NULL;
     for (int i = 0; i < testTimes; i++) {
         D = randDataUnique(dataStart, dataEnd, dataNum);
         T = BST_Init(D->seq, dataNum);
-        for (int i = 0; i < deleteTimes; i++) {
-            BST_Delete(&T, D->seq[i]);
-        }
-        if (!isBST(T)) {
-            for (int i = 0; i < dataNum; i++) {
-                fprintf(fp, "%d ", D->seq[i]);
+        BST_addCount(T);
+        quickSort(D->seq, D->length);
+        for (int i = 1; i < dataNum / 2; i++) {
+            if (BST_KthLess(T, i)->data != D->seq[i - 1]) {
+                fprintf(fp, "%d ", D->seq[i - 1]);
             }
-            fprintf(fp, "\n");
         }
+        // for (int i = 0; i < deleteTimes; i++) {
+        //     BST_Delete(&T, D->seq[i]);
+        // }
+        // if (!isBST(T)) {
+        //     for (int i = 0; i < dataNum; i++) {
+        //         fprintf(fp, "%d ", D->seq[i]);
+        //     }
+        //     fprintf(fp, "\n");
+        // }
     }
     fclose(fp);
 }
 
 void testAVL() {
-    int testTimes = 200;
+    int testTimes = 500;
     int dataStart = 0;
-    int dataEnd = 1000;
-    int dataNum = 100;
-    int deleteTimes = 40;
+    int dataEnd = 1000000;
+    int dataNum = 5000;
+    int deleteTimes = 2000;
     FILE* fp = fopen("test/output.txt", "w");
     testData* D = NULL;
     AVLTree T = NULL;
@@ -254,9 +261,9 @@ void testRB_single() {
 void testRB() {
     int testTimes = 500;
     int dataStart = 0;
-    int dataEnd = 1000;
-    int dataNum = 100;
-    int deleteTimes = 99;
+    int dataEnd = 1000000;
+    int dataNum = 5000;
+    int deleteTimes = 2000;
     FILE* fp = fopen("test/output.txt", "w");
     testData* D = NULL;
     RBTree T = NULL;
@@ -323,14 +330,23 @@ void testB() {
     fclose(fp);
 }
 
+void testSearchTime(void (*func)()) {
+    clock_t start = clock();
+    func();
+    clock_t end = clock();
+    printf("%3.3fs\n", (float)(end - start) / 1000);
+}
+
 void testSearch() {
-    //testAVL();
-    //testAVL_single();
-    //testRB_single();
-    //testRB();
-    //testSearchFunc();
-    //testB_single();
-    //testB();
+    // testAVL();
+    // testAVL_single();
+    // testRB_single();
+    // testRB();
+    // testSearchFunc();
+    // testB_single();
+    // testB();
+    // testSearchTime(testRB);
+    testBST();
 }
 
 void testSortTime(void (*func)(int*, int), int n) {
@@ -342,10 +358,10 @@ void testSortTime(void (*func)(int*, int), int n) {
 }
 
 void testSortAccuracy(void (*func)(int*, int)) {
-    int testTimes = 500;
+    int testTimes = 50;
     int dataStart = 0;
-    int dataEnd = 10000;
-    int dataNum = 1000;
+    int dataEnd = INT_MAX >> 2;
+    int dataNum = 100000;
     FILE* fp = fopen("test/output.txt", "w");
     testData* D = NULL;
     int flag = 1;
@@ -460,11 +476,11 @@ void testReplaceSelectSort() {
 
 void testSort() {
     // writeRandData();
-    // testSortAccuracy(countSort);
-    // testSortTime(bidiBubbleSort, 80000);
-    // testSortTime(bubbleSort, 80000);
+    testSortAccuracy(radixSortUseArrayOptimized);
+    // testSortTime(quickSort, 30000000);
+    // testSortTime(radixSortUseArrayOptimized, 30000000);
     // testSelectAccuracy(quickSelect);
     // testSortFuncAccuracy();
     // testKMergeSortAccuracy();
-    testReplaceSelectSort();
+    // testReplaceSelectSort();
 }

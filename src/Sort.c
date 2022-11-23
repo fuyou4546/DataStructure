@@ -44,11 +44,10 @@ void binaryInsertionSort(int* L, int n) {
 }
 
 void shellSort(int* L, int n) {
-    int incr = 1, temp, i, j;
+    int incr = 1, temp, j;
     while (incr < n) incr = (incr << 1) + 1;
-    incr >>= 1;
-    for (; incr; incr >>= 1) {
-        for (i = incr; i < n; i++) {
+    while (incr >>= 1) {
+        for (int i = incr; i < n; i++) {
             if (L[i] < L[i - incr]) {
                 temp = L[i];
                 for (j = i; j >= incr && temp < L[j - incr]; j -= incr) {
@@ -122,14 +121,14 @@ void selectSort(int* L, int n) {
 
 // 调整堆的第k个元素
 void heapAdjust(int* L, int k, int n) {
-    int temp = L[k - 1];
+    L[0] = L[k];
     for (int i = 2 * k; i <= n; i *= 2) {
-        if (i < n && L[i - 1] < L[i]) i++;
-        if (temp >= L[i - 1]) break;
-        L[k - 1] = L[i - 1];
+        if (i < n && L[i] < L[i + 1]) i++;
+        if (L[0] >= L[i]) break;
+        L[k] = L[i];
         k = i;
     }
-    L[k - 1] = temp;
+    L[k] = L[0];
 }
 void heapBuild(int* L, int n) {
     for (int i = n / 2; i > 0; i--) {
@@ -139,13 +138,12 @@ void heapBuild(int* L, int n) {
 void heapSort(int* L, int n) {
     // 自底向上建大顶堆
     heapBuild(L, n);
-    int temp;
     // 依次将堆顶元素与堆底元素交换, 调整除堆底的剩余堆
-    for (int i = n - 1; i > 0; i--) {
-        temp = L[i];
-        L[i] = L[0];
-        L[0] = temp;
-        heapAdjust(L, 1, i);
+    for (int i = n; i > 1; i--) {
+        L[0] = L[i];
+        L[i] = L[1];
+        L[1] = L[0];
+        heapAdjust(L, 1, i - 1);
     }
 }
 
@@ -177,10 +175,10 @@ typedef struct rSLink {
     int data;
     struct rSLink* next;
 } rSLink;
-void radixSort(int* L, int n) {
+void radixSortUseLink(int* L, int n) {
     // 将列表转为链表
     rSLink* head = calloc(1, sizeof(rSLink));
-    rSLink *front[10] = { 0 }, *rear[10] = { 0 };
+    rSLink* front[10] = { 0 }, *rear[10] = { 0 };
     for (int i = 0; i < n; i++) {
         rSLink* node = malloc(sizeof(rSLink));
         node->key = node->data = L[i];
@@ -233,20 +231,68 @@ void radixSort(int* L, int n) {
     }
 }
 
-void bidiBubbleSort(int* L, int n) {
-    int left = 0, right = n - 1, flag = 1, temp;
-    while (left < right) {
-        flag = 0;
-        for (int i = right; i > left; i--) {
-            if (L[i] < L[i - 1]) {
-                temp = L[i];
-                L[i] = L[i - 1];
-                L[i - 1] = temp;
-                flag = 1;
-            }
+void radixSortUseArray(int* L, int n) {
+    int maxKey = INT_MIN, d = 1;
+    for (int i = 0; i < n; i++) {
+        if (L[i] > maxKey) maxKey = L[i];
+    }
+    while (maxKey /= 100) d++;
+    int* count = malloc(100 * sizeof(int));
+    int* temp = malloc(n * sizeof(int));
+    int radix = 1, k = 0;
+    for (int i = 0; i < d; i++) {
+        memset(count, 0, 100 * sizeof(int));
+        for (int j = 0; j < n; j++) {
+            k = (L[j] / radix) % 100;
+            count[k]++;
         }
-        if (!flag) return;
-        left++;
+        for (int j = 1; j < 100; j++) {
+            count[j] += count[j - 1]; 
+        }
+        for (int j = n - 1; j >= 0; j--) {
+            k = (L[j] / radix) % 100;
+            temp[count[k] - 1] = L[j];
+            count[k]--;
+        }
+        memcpy(L, temp, n * sizeof(int));
+        radix *= 100;
+    }
+    free(count);
+    free(temp);
+}
+
+int radix = 1024;
+int p[] = {0, 10, 20, 30};
+int getPart(int key, int i) {
+    return key >> p[i] & (radix - 1);
+}
+void radixSortUseArrayOptimized(int* L, int n) {
+    int maxKey = INT_MIN, d = 4;
+    int* count = malloc(radix * sizeof(int));
+    int* temp = malloc(n * sizeof(int));
+    int k = 0;
+    for (int i = 0; i < d; i++) {
+        memset(count, 0, radix * sizeof(int));
+        for (int j = 0; j < n; j++) {
+            count[getPart(L[j], i)]++;
+        }
+        for (int j = 1; j < radix; j++) {
+            count[j] += count[j - 1]; 
+        }
+        for (int j = n - 1; j >= 0; j--) {
+            k = getPart(L[j], i);
+            temp[count[k] - 1] = L[j];
+            count[k]--;
+        }
+        memcpy(L, temp, n * sizeof(int));
+    }
+    free(count);
+    free(temp);
+}
+
+void bidiBubbleSort(int* L, int n) {
+    int left = 0, right = n - 1, flag = 0, temp;
+    while (left < right) {
         for (int i = left; i < right; i++) {
             if (L[i] > L[i + 1]) {
                 temp = L[i];
@@ -256,7 +302,19 @@ void bidiBubbleSort(int* L, int n) {
             }
         }
         if (!flag) return;
+        flag = 0;
         right--;
+        for (int i = right; i > left; i--) {
+            if (L[i] < L[i - 1]) {
+                temp = L[i];
+                L[i] = L[i - 1];
+                L[i - 1] = temp;
+                flag = 1;
+            }
+        }
+        if (!flag) return;
+        flag = 0;
+        left++;
     }
 }
 
@@ -288,23 +346,27 @@ int quickSelect(int* L, int n, int k) {
 }
 
 void colorPartition(int* L, int n) {
-    int i = 0, j = 0, k = n - 1, temp;
-    while (j <= k) {
-        if (L[j] == 1) {
-            temp = L[j];
-            L[j] = L[i];
-            L[i] = temp;
-            i++;
-            j++;
+    // left左侧全1, right右侧全3
+    int left = 0, cur = 0, right = n - 1, temp;
+    // 此处要包含等于, 因为right处可能是1
+    while (cur <= right) {
+        // 此处直接增加cur, 因为不可能将
+        if (L[cur] == 1) {
+            temp = L[cur];
+            L[cur] = L[left];
+            L[left] = temp;
+            left++;
+            cur++;
         }
-        else if (L[j] == 2) {
-            j++;
+        else if (L[cur] == 2) {
+            cur++;
         }
+        // 此处不增加cur, 因为可能会将3交换过来
         else {
-            temp = L[j];
-            L[j] = L[k];
-            L[k] = temp;
-            k--;
+            temp = L[cur];
+            L[cur] = L[right];
+            L[right] = temp;
+            right--;
         }
     }
 }
@@ -317,8 +379,28 @@ void setP(int* L, int mid, int left, int right) {
     setP(L, mid, pos + 1, right);
 }
 int setPartition(int* L, int n) {
-    setP(L, n / 2, 0, n - 1);
-    return n / 2;
+    int mid = n / 2, res = 0;
+    setP(L, mid, 0, n - 1);
+    for (int i = n - 1; i >= mid; i--) res += L[i];
+    for (int i = 0; i < mid; i++) res -= L[i];
+    return res;
+}
+
+int setPartition2(int* L, int n) {
+    int left = 0, right = n - 1, pivotpos = 0, mid = n / 2, res = 0;
+    while (1) {
+        pivotpos = partition(L, left, right);
+        if (pivotpos == mid) break;
+        if (pivotpos > mid) {
+            right = pivotpos - 1;
+        }
+        else {
+            left = pivotpos + 1;
+        }
+    }
+    for (int i = n - 1; i >= mid; i--) res += L[i];
+    for (int i = 0; i < mid; i++) res -= L[i];
+    return res;
 }
 
 void selectSortLinkList(LinkList* L) {

@@ -114,10 +114,10 @@ void trans(Link2* h) {
 }
 
 int main() {
-    //testSLinkList();
-    //testPolynomial();
-    //testSearch();
-    //testSort();
-    //solution();
-    testGraph();
+    // testSLinkList();
+    // testPolynomial();
+    // testSearch();
+    testSort();
+    // solution();
+    // testGraph();
 }

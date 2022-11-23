@@ -71,32 +71,58 @@ int BST_Delete(BSTTree* T, int key) {
     int temp = 0;
     while (p && p->data != key) {
         pre = p;
-        if (p->data > key) p = p->lchild;
+        if (p->data > key) {
+            p = p->lchild;
+        }
         else p = p->rchild;
     }
-    if (!p) return 0;
+    if (!p) {
+        return 0;
+    }
     if (p->lchild && p->rchild) {
+        pre = p;
         q = p->rchild;
-        while (q && q->lchild) q = q->lchild;
+        while (q && q->lchild) {
+            pre = q;
+            q = q->lchild;
+        }
         temp = q->data;
-        BST_Delete(T, q->data);
+        BST_Delete(&pre, q->data);
         p->data = temp;
     }
     else {
         if (p->lchild) {
-            if (!pre) *T = p->lchild;
-            else if (pre->lchild == p) pre->lchild = p->lchild;
-            else pre->rchild = p->lchild;
+            if (!pre) {
+                *T = p->lchild;
+            }
+            else if (pre->lchild == p) {
+                pre->lchild = p->lchild;
+            }
+            else {
+                pre->rchild = p->lchild;
+            }
         }
         else if (p->rchild) {
-            if (!pre) *T = p->rchild;
-            else if (pre->lchild == p) pre->lchild = p->rchild;
-            else pre->rchild = p->rchild;
+            if (!pre) {
+                *T = p->rchild;
+            }
+            else if (pre->lchild == p) {
+                pre->lchild = p->rchild;
+            }
+            else {
+                pre->rchild = p->rchild;
+            }
         }
         else {
-            if (!pre) *T = NULL;
-            else if (pre->lchild == p) pre->lchild = NULL;
-            else pre->rchild = NULL;
+            if (!pre) {
+                *T = NULL;
+            }
+            else if (pre->lchild == p) {
+                pre->lchild = NULL;
+            }
+            else {
+                pre->rchild = NULL;
+            }
         }
         free(p);
     }
@@ -181,23 +207,18 @@ void BST_printKeyGTE(BSTTree T, int k) {
 }
 
 int BST_addCount(BSTTree T) {
-    if (!T) return -1;
+    if (!T) return 0;
     int cl = BST_addCount(T->lchild);
     int cr = BST_addCount(T->rchild);
-    return T->count = cl + cr + 2;
+    return T->count = cl + cr + 1;
 }
 
 BSTNode* BST_KthLess(BSTTree T, int k) {
     if (!T) return NULL;
-    if (!T->lchild) {
-        if (k == 1) return T;
-        return BST_KthLess(T->rchild, k - 1);
-    }
-    if (T->lchild->count + 2 == k) return T;
-    if (T->lchild->count + 2 < k) {
-        return BST_KthLess(T->rchild, k - T->lchild->count - 2);
-    }
-    return BST_KthLess(T->lchild, k);
+    int left = T->lchild ? T->lchild->count : 0;
+    if (k == left + 1) return T;
+    if (k < left + 1) return BST_KthLess(T->lchild, k);
+    return BST_KthLess(T->rchild, k - left - 1);
 }
 
 // -----------------AVL-----------------
@@ -309,11 +330,8 @@ int isavl(AVLTree T, int* flag) {
 }
 int isAVL(AVLTree T) {
     int flag = 1;
-    if (isBST(T)) {
-        isavl(T, &flag);
-        return flag;
-    }
-    return 0;
+    isavl(T, &flag);
+    return flag;
 }
 
 int AVL_Delete(AVLTree* T, int key) {
@@ -360,6 +378,7 @@ int RB_Insert(RBTree* T, int key) {
     RBTree p = *T, q, path[MAX_LEN];
     char mode[MAX_LEN][3] = { 0 };
     int top = -1;
+    // 找插入位置并记录路径上结点及其相对位置
     while (p) {
         path[++top] = p;
         if (key == p->data) return 0;
@@ -433,9 +452,11 @@ RBTree RB_Init(int* key, int n) {
 
 int isrb(RBTree T, int blackNum, int countBlack) {
     if (!T) return 1;
+    // 红结点相邻
     if (T->color == 'r' && (T->lchild && T->lchild->color == 'r' ||
         T->rchild && T->rchild->color == 'r')) return 0;
     if (T->color == 'b') countBlack++;
+    // 黑高是否等
     if (!T->lchild && !T->rchild) return blackNum == countBlack;
     return isrb(T->lchild, blackNum, countBlack) && 
             isrb(T->rchild, blackNum, countBlack);

@@ -333,7 +333,9 @@ int* Dijkstra(MatGraph* G, int u) {
 
 int** Floyd(MatGraph* G) {
     int** path = malloc((1 + G->vexnum) * sizeof(int*));
-    for (int i = 0; i <= G->vexnum; i++) path[i] = malloc((1 + G->vexnum) * sizeof(int));
+    for (int i = 0; i <= G->vexnum; i++) {
+        path[i] = malloc((1 + G->vexnum) * sizeof(int));
+    }
     for (int i = 1; i <= G->vexnum; i++) {
         for (int j = 1; j <= G->vexnum; j++) {
             path[i][j] = G->Edge[i][j];
@@ -363,14 +365,18 @@ int* TopologicalSort(AdjListGraph* G) {
         }
     }
     for (int i = 1; i <= G->vexnum; i++) {
-        if (!indegree[i]) st[++top] = i;
+        if (!indegree[i]) {
+            st[++top] = i;
+        }
     }
     while (top != -1) {
         u = st[top--];
         seq[cur++] = u;
         for (ArcNode* p = G->vertices[u].first; p; p = p->next) {
             indegree[p->adjvex]--;
-            if (!indegree[p->adjvex]) st[++top] = p->adjvex;
+            if (!indegree[p->adjvex]) {
+                st[++top] = p->adjvex;
+            }
         }
     }
     free(st);
