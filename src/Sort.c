@@ -176,9 +176,10 @@ typedef struct rSLink {
     struct rSLink* next;
 } rSLink;
 void radixSortUseLink(int* L, int n) {
+    int radix = 1000;
     // 将列表转为链表
     rSLink* head = calloc(1, sizeof(rSLink));
-    rSLink* front[10] = { 0 }, *rear[10] = { 0 };
+    rSLink* front[1000] = { 0 }, *rear[1000] = { 0 };
     for (int i = 0; i < n; i++) {
         rSLink* node = malloc(sizeof(rSLink));
         node->key = node->data = L[i];
@@ -193,7 +194,7 @@ void radixSortUseLink(int* L, int n) {
         while (p) {
             q = p->next;
             p->next = NULL;
-            k = p->data % 10;
+            k = p->data % radix;
             if (!front[k]) {
                 front[k] = rear[k] = p;
             }
@@ -202,7 +203,7 @@ void radixSortUseLink(int* L, int n) {
                 rear[k] = p;
             }
             if (p->data) {
-                p->data /= 10;
+                p->data /= radix;
                 flag = 1;
             }
             p = q;
@@ -221,7 +222,7 @@ void radixSortUseLink(int* L, int n) {
             if (front[i]) break;
         }
         p = front[i];
-        for (int j = i + 1; j < 10; j++) {
+        for (int j = i + 1; j < radix; j++) {
             if (!front[j]) continue;
             rear[i]->next = front[j];
             front[i] = rear[i] = NULL;
@@ -232,55 +233,65 @@ void radixSortUseLink(int* L, int n) {
 }
 
 void radixSortUseArray(int* L, int n) {
+    int radix = 1000;
+    // 获取最多趟数
     int maxKey = INT_MIN, d = 1;
     for (int i = 0; i < n; i++) {
         if (L[i] > maxKey) maxKey = L[i];
     }
-    while (maxKey /= 100) d++;
-    int* count = malloc(100 * sizeof(int));
+    while (maxKey /= radix) d++;
+    // count统计一趟分配后各桶中键值数
+    int* count = malloc(radix * sizeof(int));
+    // temp暂存一趟收集后的序列
     int* temp = malloc(n * sizeof(int));
-    int radix = 1, k = 0;
+    // base
+    int base = 1, k = 0;
     for (int i = 0; i < d; i++) {
-        memset(count, 0, 100 * sizeof(int));
+        // 初始化count为0
+        memset(count, 0, radix * sizeof(int));
+        // 分配
         for (int j = 0; j < n; j++) {
-            k = (L[j] / radix) % 100;
+            k = (L[j] / base) % radix;
             count[k]++;
         }
-        for (int j = 1; j < 100; j++) {
+        // 累加以确定各桶在temp中的末位置
+        for (int j = 1; j < radix; j++) {
             count[j] += count[j - 1]; 
         }
+        // 收集
         for (int j = n - 1; j >= 0; j--) {
-            k = (L[j] / radix) % 100;
+            k = (L[j] / base) % radix;
             temp[count[k] - 1] = L[j];
             count[k]--;
         }
         memcpy(L, temp, n * sizeof(int));
-        radix *= 100;
+        base *= radix;
     }
     free(count);
     free(temp);
 }
 
-int radix = 1024;
-int p[] = {0, 10, 20, 30};
-int getPart(int key, int i) {
-    return key >> p[i] & (radix - 1);
-}
 void radixSortUseArrayOptimized(int* L, int n) {
-    int maxKey = INT_MIN, d = 4;
+    int radix = 2 << 8;
+    // p[i]表示右移的位数
+    int p[] = {0, 8, 16, 24};
+    // 最多4躺, 因INT_MAX实际最多31位, 一趟移8位
+    int d = 4;
     int* count = malloc(radix * sizeof(int));
     int* temp = malloc(n * sizeof(int));
     int k = 0;
     for (int i = 0; i < d; i++) {
         memset(count, 0, radix * sizeof(int));
         for (int j = 0; j < n; j++) {
-            count[getPart(L[j], i)]++;
+            // 
+            k = L[j] >> p[i] & (radix - 1);
+            count[k]++;
         }
         for (int j = 1; j < radix; j++) {
             count[j] += count[j - 1]; 
         }
         for (int j = n - 1; j >= 0; j--) {
-            k = getPart(L[j], i);
+            k = L[j] >> p[i] & (radix - 1);
             temp[count[k] - 1] = L[j];
             count[k]--;
         }

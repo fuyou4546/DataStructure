@@ -79,6 +79,10 @@ void testTree() {
     BiNode node4 = {4, NULL, NULL, 0, 0}, node3 = {3, NULL, NULL, 0, 0}, node2 = {2, &node4, &node5, 0, 0};
     BiNode node1 = {1, &node2, &node3, 0, 0};
     BiTree root = &node1;
+    int level[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+    int in[] = {4,2,11,8,12,5,9,1,6,14,13,15,10,3,7};
+    BiTree T = levelAndInBuildTree(level, in, sizeof(in) / sizeof(int));
+    levelOrder(T);
 }
 
 void testGraph() {
@@ -156,8 +160,8 @@ testData* randDataUnique(int x, int y, int n) {
 
 void writeRandData() {
     int dataStart = 0;
-    int dataEnd = INT_MAX >> 1;
-    int dataNum = INT_MAX >> 6;
+    int dataEnd = INT_MAX;
+    int dataNum = INT_MAX >> 5;
     testData* D = randData(dataStart, dataEnd, dataNum);
     FILE* fp = fopen("test/input.txt", "w");
     for (int i = 0; i < D->length; i++) {
@@ -358,15 +362,15 @@ void testSortTime(void (*func)(int*, int), int n) {
 }
 
 void testSortAccuracy(void (*func)(int*, int)) {
-    int testTimes = 50;
+    int testTimes = 10;
     int dataStart = 0;
-    int dataEnd = INT_MAX >> 2;
-    int dataNum = 100000;
+    int dataEnd = INT_MAX >> 10;
+    int dataNum = 10000;
     FILE* fp = fopen("test/output.txt", "w");
     testData* D = NULL;
     int flag = 1;
     for (int i = 0; i < testTimes; i++) {
-        D = randDataUnique(dataStart, dataEnd, dataNum);
+        D = randData(dataStart, dataEnd, dataNum);
         func(D->seq, D->length);
         if (!isAscending(D->seq, D->length)) {
             flag = 0;
@@ -476,9 +480,9 @@ void testReplaceSelectSort() {
 
 void testSort() {
     // writeRandData();
-    testSortAccuracy(radixSortUseArrayOptimized);
-    // testSortTime(quickSort, 30000000);
-    // testSortTime(radixSortUseArrayOptimized, 30000000);
+    // testSortAccuracy(radixSortUseLink);
+    // testSortTime(quickSort, 10000000);
+    // testSortTime(radixSortUseArrayOptimized, 10000000);
     // testSelectAccuracy(quickSelect);
     // testSortFuncAccuracy();
     // testKMergeSortAccuracy();

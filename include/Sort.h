@@ -15,6 +15,8 @@ void heapBuild(int* L, int n);
 void heapSort(int* L, int n);
 void mergeSort(int* L, int n);
 void radixSortUseLink(int* L, int n);
+void radixSortUseArray(int* L, int n);
+void radixSortUseArrayOptimized(int* L, int n);
 void bidiBubbleSort(int* L, int n);
 void moveOddBeforeEven(int* L, int n);
 int quickSelect(int* L, int n, int k);
@@ -28,5 +30,3 @@ void countSort(int* L, int n);
 void kMergeSort(int** L, int* len, int r, int total, int* res);
 // 将L划分为r个归并段, 段res[i]长len[i]
 void replaceSelectSort(int* L, int n, int w, int** res, int* len, int* r);
-void radixSortUseArray(int* L, int n);
-void radixSortUseArrayOptimized(int* L, int n);

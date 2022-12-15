@@ -201,11 +201,16 @@ void testKMP() {
         printf("%d ", next[i]);
     }
 }
+void testAllOut() {
+    int L[] = {1, 2, 3, 4};
+    allOneSideOutSeq(L, sizeof(L) / sizeof(int));
+}
 
 void solution() {
     // printf("%d", C21(1, 29, 2));
     // testFILE();
     // testChangeLink();
     // testKMP();
-    testDS21();
+    // testDS21();
+    testAllOut();
 }

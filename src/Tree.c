@@ -3,40 +3,60 @@
 void visit(BiTree T) {
     printf("%d ", T->data);
 }
+
 void preOrder(BiTree T) {
     if (!T) return;
     visit(T);
     preOrder(T->lchild);
     preOrder(T->rchild);
 }
+
 void inOrder(BiTree T) {
     if (!T) return;
     inOrder(T->lchild);
     visit(T);
     inOrder(T->rchild);
 }
+
 void postOrder(BiTree T) {
     if (!T) return;
     postOrder(T->lchild);
     postOrder(T->rchild);
     visit(T);
 }
+
+void levelOrder(BiTree T) {
+    BiTree* queue = malloc(MAX_TREE_SIZE * sizeof(BiTree));
+    int front = 0, rear = 0;
+    queue[rear++] = T;
+    BiTree temp = NULL;
+    while (front != rear) {
+        temp = queue[front++];
+        visit(temp);
+        if (temp->lchild) queue[rear++] = temp->lchild;
+        if (temp->rchild) queue[rear++] = temp->rchild;
+    }
+}
+
 void addP(BiTree T, BiNode* p) {
     if (!T) return;
     T->parent = p;
     addP(T->lchild, T);
     addP(T->rchild, T);
 }
+
 void addParent(BiTree T) {
     BiNode* p = NULL;
     addP(T, p);
 }
+
 int getHeight(BiTree T) {
     if (!T) return 0;
     int hl = getHeight(T->lchild);
     int hr = getHeight(T->rchild);
     return (hl > hr ? hl : hr) + 1;
 }
+
 int isCBiTree(BiTree T) {
     BiNode* Q[1000], *p = NULL;
     int front = 0, rear = 0;
@@ -55,6 +75,7 @@ int isCBiTree(BiTree T) {
     }
     return 1;
 }
+
 BiTree exchange(BiTree T) {
     if (!T) return NULL;
     BiTree left = exchange(T->lchild);
@@ -63,6 +84,7 @@ BiTree exchange(BiTree T) {
     T->rchild = left;
     return T;
 }
+
 void freeTree(BiTree* T) {
     if (!(*T)) return;
     freeTree(&((*T)->lchild));
@@ -70,6 +92,7 @@ void freeTree(BiTree* T) {
     free(*T);
     *T = NULL;
 }
+
 void freeXSubTree(BiTree T, int x) {
     if (!T) return;
     if (T->lchild && T->lchild->data == x) {
@@ -85,16 +108,18 @@ void freeXSubTree(BiTree T, int x) {
     freeXSubTree(T->lchild, x);
     freeXSubTree(T->rchild, x);
 }
+
 int _flag = 0;
 void findXAncestors(BiTree T, int x) {
     if (_flag || !T) return;
     findXAncestors(T->lchild, x);
     findXAncestors(T->rchild, x);
     if (_flag || T->data == x) {
-        if (_flag) printf("%d ", T->data);
+        if (_flag) visit(T);
         else _flag = 1;
     }
 }
+
 BiNode* findPublicAncestor(BiTree T, BiNode* p, BiNode* q) {
     if (!T || T == p || T == q) return T;
     BiNode* x = findPublicAncestor(T->lchild, p, q);
@@ -103,6 +128,7 @@ BiNode* findPublicAncestor(BiTree T, BiNode* p, BiNode* q) {
     if (x) return x;
     return y;
 }
+
 void findPublicAncestor2(BiTree T, BiNode* p, BiNode* q, BiTree* res) {
     if (!T || T == p || T == q) {
         *res = T;
@@ -116,6 +142,7 @@ void findPublicAncestor2(BiTree T, BiNode* p, BiNode* q, BiTree* res) {
     else if (x) *res = x;
     else *res = y;
 }
+
 int getWidth(BiTree T) {
     BiNode* Q[100];
     int front = 0, rear = 0, width = 0, w, temp;
@@ -134,6 +161,7 @@ int getWidth(BiTree T) {
     }
     return width;
 }
+
 void preToP(int* pre, int* post, int pre_l, int pre_r, int post_l, int post_r) {
     if (pre_l > pre_r) return;
     post[post_r] = pre[pre_l];
@@ -141,11 +169,13 @@ void preToP(int* pre, int* post, int pre_l, int pre_r, int post_l, int post_r) {
     preToP(pre, post, pre_l + 1, pre_l + half, post_l, post_l + half - 1);
     preToP(pre, post, pre_l + half + 1, pre_r, post_l + half, post_r - 1);
 }
+
 int* preToPost(int* pre, int n) {
     int* post = (int*)malloc(n * sizeof(int));
     preToP(pre, post, 0, n - 1, 0, n - 1);
     return post;
 }
+
 void linkL(BiTree T, BiTree* pre) {
     if (!T) return;
     if (!T->lchild && !T->rchild) {
@@ -162,6 +192,7 @@ BiNode* linkLeafs(BiTree T) {
     linkL(T, &p);
     return head;
 }
+
 int isSimilar(BiTree T1, BiTree T2) {
     if (!T1 && !T2) return 1;
     if (T1 && T2) return isSimilar(T1->lchild, T2->lchild) && isSimilar(T1->rchild, T2->rchild);
@@ -182,12 +213,14 @@ void preThread(BiTree T, BiTree* pre) {
     if (!T->ltag) preThread(T->lchild, pre);
     if (!T->rtag) preThread(T->rchild, pre);
 }
+
 void createPreThread(BiTree T) {
     BiNode* pre = NULL;
     preThread(T, &pre);
     pre->rchild = NULL;
     pre->rtag = 1;
 }
+
 void preThreadOrder(BiTree T) {
     while (T) {
         visit(T);
@@ -210,12 +243,14 @@ void inThread(BiTree T, BiTree* pre) {
     *pre = T;
     inThread(T->rchild, pre);
 }
+
 void createInThread(BiTree T) {
     BiNode* pre = NULL;
     inThread(T, &pre);
     pre->rchild = NULL;
     pre->rtag = 1;
 }
+
 void inThreadOrder(BiTree T) {
     if (!T) return;
     while (!T->ltag) T = T->lchild;
@@ -243,6 +278,7 @@ void postThread(BiTree T, BiTree* pre) {
     }
     *pre = T;
 }
+
 void createPostThread(BiTree T) {
     addParent(T);
     BiNode* pre = NULL;
@@ -251,6 +287,7 @@ void createPostThread(BiTree T) {
         pre->rtag = 1;
     }
 }
+
 void postThreadOrder(BiTree T) {
     BiNode* p = T, *pre = NULL;
     while (p) {
@@ -407,13 +444,13 @@ int countNode(BiTree T) {
     return countNode(T->lchild) + countNode(T->rchild) + 1;
 }
 
-BiTree build(int* pre, int* in, int* mark, int pl, int pr, int il, int ir) {
+BiTree preInbuild(int* pre, int* mark, int pl, int pr, int il, int ir) {
     if (pl > pr) return NULL;
     BiNode* node = malloc(sizeof(BiNode));
     node->data = pre[pl];
     int index = mark[pre[pl]];
-    node->lchild = build(pre, in, mark, pl + 1, pl + index - il, il, index - 1);
-    node->rchild = build(pre, in, mark, pl + index - il + 1, pr, index + 1, ir);
+    node->lchild = preInbuild(pre, mark, pl + 1, pl + index - il, il, index - 1);
+    node->rchild = preInbuild(pre, mark, pl + index - il + 1, pr, index + 1, ir);
     return node;
 }
 BiTree preAndInBuildTree(int* pre, int* in, int n) {
@@ -421,7 +458,47 @@ BiTree preAndInBuildTree(int* pre, int* in, int n) {
     for (int i = 0; i < n; i++) {
         mark[in[i]] = i;
     }
-    return build(pre, in, mark, 0, n - 1, 0, n - 1);
+    return preInbuild(pre, mark, 0, n - 1, 0, n - 1);
+}
+
+BiTree postInbuild(int* post, int* mark, int pl, int pr, int il, int ir) {
+    if (pl > pr) return NULL;
+    BiNode* node = malloc(sizeof(BiNode));
+    node->data = post[pr];
+    int index = mark[post[pr]];
+    node->lchild = postInbuild(post, mark, pl, pl + index - il - 1, il, index - 1);
+    node->rchild = postInbuild(post, mark, pl + index - il, pr - 1, index + 1, ir);
+    return node;
+}
+BiTree postAndInBuildTree(int* post, int* in, int n) {
+    int* mark = malloc(n * sizeof(int));
+    for (int i = 0; i < n; i++) {
+        mark[in[i]] = i;
+    }
+    return postInbuild(post, mark, 0, n - 1, 0, n - 1);
+}
+
+BiTree levelInbuild(int* level, int* mark, int* temp, int left, int right) {
+    if (left > right) return NULL;
+    BiTree node = malloc(sizeof(BiTree));
+    int index = mark[level[left]];
+    node->data = level[left];
+    int cur1 = left, cur2 = index + 1;
+    for (int i = left + 1; i <= right; i++) {
+        if (mark[level[i]] < index) temp[cur1++] = level[i];
+        if (mark[level[i]] > index) temp[cur2++] = level[i];
+    }
+    node->lchild = levelInbuild(temp, mark, level, left, index - 1);
+    node->rchild = levelInbuild(temp, mark, level, index + 1, right);
+    return node;
+}
+BiTree levelAndInBuildTree(int* level, int* in, int n) {
+    int* mark = malloc(n * sizeof(int));
+    int* temp = malloc(n * sizeof(int));
+    for (int i = 0; i < n; i++) {
+        mark[in[i]] = i;
+    }
+    return levelInbuild(level, mark, temp, 0, n - 1);
 }
 
 CSTree buildCSTree2(int* in, int* degree, int n) {
@@ -440,6 +517,64 @@ CSTree buildCSTree2(int* in, int* degree, int n) {
                 // 孩子cur依次连接兄弟cur+1
                 cur++;
                 pointer[cur - 1]->nextsibling = pointer[cur];
+            }
+        }
+    }
+}
+
+void preOrderNonRecursive(BiTree T) {
+    BiTree* stack = malloc(MAX_TREE_SIZE * sizeof(BiTree));
+    int top = 0;
+    while (T || top) {
+        if (T) {
+            visit(T);
+            stack[top++] = T;
+            T = T->lchild;
+        }
+        else {
+            T = stack[--top]->rchild;
+        }
+    }
+}
+
+void inOrderNonRecursive(BiTree T) {
+    BiTree* stack = malloc(MAX_TREE_SIZE * sizeof(BiTree));
+    int top = 0;
+    while (T && top) {
+        if (T) {
+            stack[top++] = T;
+            T = T->lchild;
+        }
+        else {
+            T = stack[--top];
+            visit(T);
+            T = T->rchild;
+        }
+    }
+}
+
+void postOrderNonRecursive(BiTree T) {
+    BiTree* stack = malloc(MAX_TREE_SIZE * sizeof(BiTree));
+    int top = 0;
+    // 标记最近访问结点
+    BiTree pre = NULL;
+    while (T || top) {
+        if (T) {
+            stack[top++] = T;
+            T = T->lchild;
+        }
+        else {
+            T = stack[top - 1];
+            if (T->rchild && T->rchild != pre) {
+                T = T->rchild;
+            }
+            else {
+                visit(T);
+                pre = T;
+                // 借while循环, 在下次循环else中取上层结点
+                // 若不置空直接取上层结点, 则在下次循环中可能进入if访问左子树, 产生循环
+                T = NULL;
+                top--;
             }
         }
     }
