@@ -249,6 +249,10 @@ int* Prim(MatGraph* G) {
     return path;
 }
 
+int* PrimWithHeap(AdjListGraph* G) {
+    //todo
+}
+
 void KheapAdjust(MulArcNode** heap, int k, int n) {
     MulArcNode* temp = heap[k];
     for (int i = 2 * k; i <= n; i *= 2) {

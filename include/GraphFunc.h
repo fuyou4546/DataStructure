@@ -14,6 +14,7 @@ int ALhavePath(AdjListGraph* G, int u, int v, int mode);
 void ALallPath(AdjListGraph* G, int u, int v);
 // 返回 path[u]=v 表示 e(u,v)
 int* Prim(MatGraph* G);
+int* PrimWithHeap(AdjListGraph* G);
 // 返回 边的id
 int* Kruskal(MulListGraph* G);
 int* Dijkstra(MatGraph* G, int u);
