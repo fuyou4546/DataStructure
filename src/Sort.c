@@ -106,6 +106,55 @@ void quickSort(int* L, int n) {
     qSort(L, 0, n - 1);
 }
 
+void threeMid(int* input, int left, int right) {
+    int mid = (left + right) / 2, temp;
+    if (input[mid] < input[left]) {
+        temp = input[mid];
+        input[mid] = input[left];
+        input[left] = temp;
+    }
+    if (input[right] < input[left]) {
+        temp = input[right];
+        input[right] = input[left];
+        input[left] = temp;
+    }
+    if (input[right] < input[mid]) {
+        temp = input[right];
+        input[right] = input[mid];
+        input[mid] = temp;
+    }
+    if (right - left < 3) return;
+    temp = input[mid];
+    input[mid] = input[left + 1];
+    input[left + 1] = temp;
+}
+int partitionThreeMid(int* input, int left, int right) {
+    threeMid(input, left, right);
+    int pivot = input[++left];
+    right--;
+    while (left < right) {
+        while (left < right && input[right] >= pivot) right--;
+        input[left] = input[right];
+        while (left < right && input[left] <= pivot) left++;
+        input[right] = input[left];
+    }
+    input[left] = pivot;
+    return left;
+}
+void qSTM(int* input, int left, int right) {
+    if (right - left < 3) {
+        if (left >= right) return;
+        partitionThreeMid(input, left, right);
+        return;
+    }
+    int pivotpos = partitionThreeMid(input, left, right);
+    qSTM(input, left, pivotpos - 1);
+    qSTM(input, pivotpos + 1, right);
+}
+void quickSortThreeMid(int* input, int n) {
+    qSTM(input, 0, n - 1);
+}
+
 void selectSort(int* L, int n) {
     int cur = 0, temp = 0;
     for (int i = 0; i < n - 1; i++) {
@@ -116,6 +165,18 @@ void selectSort(int* L, int n) {
         temp = L[i];
         L[i] = L[cur];
         L[cur] = temp;
+    }
+}
+
+void heapAdd(int* L, int n, int key) {
+    L[++n] = key;
+    for (int i = n / 2, k = 0, temp = 0; i >= 1; i /= 2) {
+        k = 2 * i;
+        if (k < n && L[k] < L[k + 1]) k++;
+        if (L[i] > L[k]) return;
+        temp = L[i];
+        L[i] = L[k];
+        L[k] = temp;
     }
 }
 

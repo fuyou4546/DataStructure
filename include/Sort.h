@@ -11,6 +11,8 @@ void shellSort(int* L, int n);
 void bubbleSort(int* L, int n);
 void quickSort(int* L, int n);
 void selectSort(int* L, int n);
+// 大根堆
+void heapAdd(int* L, int n, int key);
 void heapBuild(int* L, int n);
 void heapSort(int* L, int n);
 void mergeSort(int* L, int n);

@@ -20,9 +20,10 @@ MatGraph* MatInitWithWeight(int* inode, int *jnode, int* weight, int n);
 
 // 邻接表
 typedef struct ArcNode {
+    int id;
     int adjvex;
     struct ArcNode* next;
-    int info;
+    int weight;
 } ArcNode;
 typedef struct {
     int data;
@@ -45,9 +46,10 @@ AdjListGraph* ALInitGraph(int* inode, int* jnode, int n);
 
 // 十字链表
 typedef struct OrthArcNode {
+    int id;
     int tailvex, headvex;
     struct OrthArcNode* taillink, *headlink;
-    int id, weight;
+    int weight;
 } OrthArcNode;
 typedef struct {
     int data;
